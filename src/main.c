@@ -93,6 +93,9 @@ int main(void)
 
             cliCom();
 
+            if (!gimbalStateEnabled)
+                LED1_TOGGLE;
+
             executionTime10Hz = micros() - currentTime;
         }
 
@@ -183,7 +186,8 @@ int main(void)
             deltaTime1Hz    = currentTime - previous1HzTime;
             previous1HzTime = currentTime;
 
-            LED1_TOGGLE;
+            if (gimbalStateEnabled)
+                LED1_TOGGLE;
 
             executionTime1Hz = micros() - currentTime;
         }

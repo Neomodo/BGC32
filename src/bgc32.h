@@ -39,7 +39,7 @@ along with EvvGC. If not, see <http://www.gnu.org/licenses/>.
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#define     PI 3.14159265f
+// AKA replaced with arm_math include #define     PI 3.14159265f
 #define TWO_PI 6.28318531f
 
 #define D2R  (PI / 180.0f)

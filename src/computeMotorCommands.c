@@ -252,8 +252,8 @@ void computeMotorCommands(float dt)
 
     ///////////////////////////////////
 
-	if (eepromConfig.rollEnabled == true)
-	{
+    if (activeRollState == true)
+    {
         pidCmd[ROLL] = updatePID(0.0f, axisError[ROLL] * mechanical2electricalDegrees[ROLL],
 	                             dt, holdIntegrators, &eepromConfig.PID[ROLL_PID]);
 
@@ -272,7 +272,7 @@ void computeMotorCommands(float dt)
 
     ///////////////////////////////////
 
-    if (eepromConfig.pitchEnabled == true)
+    if (activePitchState == true)
     {
         pidCmd[PITCH] = updatePID(axisError[PITCH] * mechanical2electricalDegrees[PITCH], 0.0f,
                                   dt, holdIntegrators, &eepromConfig.PID[PITCH_PID]);
@@ -292,7 +292,7 @@ void computeMotorCommands(float dt)
 
     ///////////////////////////////////
 
-    if (eepromConfig.yawEnabled == true)
+    if (activeYawState == true)
     {
         pidCmd[YAW] = updatePID(axisError[YAW] * mechanical2electricalDegrees[YAW], 0.0f,
                                 dt, holdIntegrators, &eepromConfig.PID[YAW_PID]);

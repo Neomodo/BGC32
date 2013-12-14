@@ -164,7 +164,7 @@ void TIM8_UP_IRQHandler(void) // roll axis
     if (cnt < MAX_CNT)
     {
         // make sure there is enough time to make all changes
-        if (eepromConfig.rollEnabled)
+        if (activeRollState)
         {
             TIM8->CCR1 = rollPhase[0];
             TIM8->CCR2 = rollPhase[1];
@@ -198,7 +198,7 @@ void TIM1_UP_IRQHandler(void) // pitch axis
     if (cnt < MAX_CNT)
     {
         // make sure there is enough time to make all changes
-        if (eepromConfig.pitchEnabled)
+        if (activePitchState)
         {
             TIM1->CCR1 = pitchPhase[0];
             TIM1->CCR2 = pitchPhase[1];
@@ -234,7 +234,7 @@ void TIM5_IRQHandler(void) // yaw axis
         if (cnt < MAX_CNT)
         {
             // make sure there is enough time to make all changes
-            if (eepromConfig.yawEnabled)
+            if (activeYawState)
             {
                 int deadTime = 2 * timer4timer5deadTimeDelay;
                 TIM4->CCR1 = yawPhase[0] + deadTime;

@@ -30,6 +30,12 @@
 
 #include "board.h"
 
+/*
+ * Defines to use the DSP Lib when ready
+ */
+//#define cosf arm_cos_f32
+//#define sinf arm_sin_f32
+
 //----------------------------------------------------------------------------------------------------
 // Variable definitions
 

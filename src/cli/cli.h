@@ -33,6 +33,10 @@ along with EvvGC. If not, see <http://www.gnu.org/licenses/>.
 
 #pragma once
 
+extern uint8_t activeRollState;
+extern uint8_t activePitchState;
+extern uint8_t activeYawState;
+
 ///////////////////////////////////////////////////////////////////////////////
 
 extern uint8_t cliBusy;

@@ -61,6 +61,19 @@ void readEEPROM(void)
     electrical2mechanicalDegrees[ROLL ] = 1.0f / mechanical2electricalDegrees[ROLL ];
     electrical2mechanicalDegrees[PITCH] = 1.0f / mechanical2electricalDegrees[PITCH];
     electrical2mechanicalDegrees[YAW  ] = 1.0f / mechanical2electricalDegrees[YAW  ];
+
+    if (gimbalStateEnabled == true)
+    {
+        activeRollState  = eepromConfig.rollEnabled;
+        activePitchState = eepromConfig.pitchEnabled;
+        activeYawState   = eepromConfig.yawEnabled;
+    }
+    else
+    {
+        activeRollState = false;
+        activePitchState = false;
+        activeYawState = false;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

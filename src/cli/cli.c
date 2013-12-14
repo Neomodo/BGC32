@@ -44,9 +44,9 @@ static volatile uint8_t validCliCommand = false;
 
 uint8_t gimbalStateEnabled = true;
 
-uint8_t savedRollState;
-uint8_t savedPitchState;
-uint8_t savedYawState;
+uint8_t activeRollState = false;
+uint8_t activePitchState = false;
+uint8_t activeYawState = false;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Read Character String from CLI
@@ -74,6 +74,15 @@ uint8_t readStringCLI(uint8_t *data)
             // chars available, let's read them and build up a string
             //  we'll check to see if it ever has a character other than those listed
             // below and set a flag to use further down
+
+            // We have a problem the lengh of the input string can't be longer
+            // than 40 characters
+            if (index > 40)
+            {
+                stringIsValid = false;
+                break;
+            }
+
             cliRead(&data[index], 1);
 
             if (!isdigit(data[index]) && data[index] != ';' && data[index] != '\r' && data[index] != '\n' && data[index] != '\b' && data[index] != '.' && data[index] != '-')
@@ -99,33 +108,65 @@ uint8_t readStringCLI(uint8_t *data)
                 index++;
             }
 
-            // ok, we got an end of line character, now we have to handle crlf and lf only
-            if (data[index - 1] == '\n')
+            // putty special case as it ends all lines with CR ONLY!!!
+            // PITA workaround!
+            if (data[index - 1] == '\r')
             {
-                if (index > 1)
+                // if there is another char see if it's a \n
+                if (cliAvailable() == true)
                 {
-                    if (data[index - 2] == '\r')
+                    uint8_t tchar = 0;
+
+                    cliRead(&tchar, 1);
+
+                    // if the next char isn't a \n, then set to invalid and exit
+                    if (tchar != '\n')
                     {
-                        // null terminate the string
-                        data[index - 2] = '\0';
-                        // we save the last char position in case we want to use it later
-                        stringEnd = &data[index - 2];
+                        stringIsValid = false;
+                        validEnd = true;
                     }
                     else
                     {
-                        // null terminate the string
-                        data[index - 1] = '\0';
-                        // we save the last char position in case we want to use it later
-                        stringEnd = &data[index - 1];
+                        // we have a valid 2 character end sequence
+                        // set the end to newline and fall through
+                        data[index - 1] = '\n';
                     }
                 }
                 else
                 {
-                    // null terminate the string
-                    data[index - 1] = '\0';
-                    // we save the last char position in case we want to use it later
-                    stringEnd = &data[index - 1];
+                    // there was no other character after the cr, so we have
+                    // a valid end, set the end to newline and fall through
+                    data[index - 1] = '\n';
                 }
+            }
+
+            // ok, we got an end of line character, now we have to handle crlf and lf only
+            if (data[index - 1] == '\n')
+            {
+                //                if (index > 1)
+                //                {
+                //                    if (data[index - 2] == '\r')
+                //                    {
+                //                        // null terminate the string
+                //                        data[index - 2] = '\0';
+                //                        // we save the last char position in case we want to use it later
+                //                        stringEnd = &data[index - 2];
+                //                    }
+                //                    else
+                //                    {
+                //                        // null terminate the string
+                //                        data[index - 1] = '\0';
+                //                        // we save the last char position in case we want to use it later
+                //                        stringEnd = &data[index - 1];
+                //                    }
+                //                }
+                //                else
+                //                {
+                // null terminate the string
+                data[index - 1] = '\0';
+                // we save the last char position in case we want to use it later
+                stringEnd = &data[index - 1];
+                //                }
 
                 // we got a valid of line so let's break from the do/while early
                 validEnd = true;
@@ -140,12 +181,12 @@ uint8_t readStringCLI(uint8_t *data)
     // do we have a string with all valid characters
     // did it end correctly (to be used if we want to force the ';' final character)
     // and is the string not a null string
-    if (stringIsValid && (stringEnd && (stringEnd - data > 0)) )
+    if (stringIsValid && (stringEnd && (stringEnd != NULL) && (stringEnd - data > 0)))
     {
         stringIsValid = elementCount;
-//        cliPrintF("string length = %d\n", stringEnd - data);
-//        cliPrintF("element count = %d\n", elementCount);
-//        cliPrintF("last char [%d]\n", *stringEnd);
+        //        cliPrintF("string length = %d\n", stringEnd - data);
+        //        cliPrintF("element count = %d\n", elementCount);
+        //        cliPrintF("last char [%d]\n", *stringEnd);
     }
     else
     {
@@ -244,13 +285,13 @@ uint8_t readCliPID(unsigned char PIDid, uint8_t *tempString)
 
 void disableGimbal(void)
 {
-    savedRollState  = eepromConfig.rollEnabled;
-    savedPitchState = eepromConfig.pitchEnabled;
-    savedYawState   = eepromConfig.yawEnabled;
+    eepromConfig.rollEnabled  = activeRollState;
+    eepromConfig.pitchEnabled = activePitchState;
+    eepromConfig.yawEnabled   = activeYawState;
 
-    eepromConfig.rollEnabled  = false;
-    eepromConfig.pitchEnabled = false;
-    eepromConfig.yawEnabled   = false;
+    activeRollState  = false;
+    activePitchState = false;
+    activeYawState   = false;
 
     pwmMotorDriverInit();
 
@@ -263,9 +304,9 @@ void disableGimbal(void)
 
 void enableGimbal(void)
 {
-    eepromConfig.rollEnabled  = savedRollState;
-    eepromConfig.pitchEnabled = savedPitchState;
-    eepromConfig.yawEnabled   = savedYawState;
+    activeRollState  = eepromConfig.rollEnabled;
+    activePitchState = eepromConfig.pitchEnabled;
+    activeYawState   = eepromConfig.yawEnabled;
 
     pwmMotorDriverInit();
 
@@ -418,9 +459,9 @@ void cliCom(void)
                 ///////////////////////////////
 
             case 'i': // Gimbal Axis Enable Flags
-                cliPrintF("\nGimbal Roll Axis:  %s\n", savedRollState  ? "Enabled" : "Disabled");
-                cliPrintF("Gimbal Pitch Axis: %s\n",   savedPitchState ? "Enabled" : "Disabled");
-                cliPrintF("Gimbal Yaw Axis:   %s\n",   savedYawState   ? "Enabled" : "Disabled");
+                cliPrintF("\nGimbal Roll Axis:  %s\n", eepromConfig.rollEnabled  ? "Enabled" : "Disabled");
+                cliPrintF("Gimbal Pitch Axis: %s\n",   eepromConfig.pitchEnabled ? "Enabled" : "Disabled");
+                cliPrintF("Gimbal Yaw Axis:   %s\n",   eepromConfig.yawEnabled   ? "Enabled" : "Disabled");
 
                 cliQuery = 'x';
                 break;
@@ -533,7 +574,10 @@ void cliCom(void)
 
             case 'v': // Version
 
+#ifdef __VERSION__
+                cliPrintF("\ngcc version " __VERSION__ "\n");
                 cliPrintF("BGC32 Firmware V%s, Build Date " __DATE__ " "__TIME__" \n", __BGC32_VERSION);
+#endif
 
                 cliQuery = 'x';
                 break;
@@ -709,15 +753,15 @@ void cliCom(void)
                 {
                     token = strtok_r((char *)tempString, ";", &state);
                     if (token != NULL)
-                        savedRollState  = (uint8_t)stringToFloat((uint8_t *)token);
+                        eepromConfig.rollEnabled  = (uint8_t)stringToFloat((uint8_t *)token);
 
                     token = strtok_r(NULL, ";", &state);
                     if (token != NULL)
-                        savedPitchState = (uint8_t)stringToFloat((uint8_t *)token);
+                        eepromConfig.pitchEnabled = (uint8_t)stringToFloat((uint8_t *)token);
 
                     token = strtok_r(NULL, ";", &state);
                     if (token != NULL)
-                        savedYawState   = (uint8_t)stringToFloat((uint8_t *)token);
+                        eepromConfig.yawEnabled   = (uint8_t)stringToFloat((uint8_t *)token);
 
                     cliPrintF("\nGimbal Axis Enable Flags Received....\n");
                 }

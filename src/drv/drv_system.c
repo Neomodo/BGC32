@@ -299,8 +299,9 @@ void systemInit(void)
         cliPrintF("\r\nBGC32 firmware starting up, serial active...\r\n");
     }
 
-#if defined(__DATE__) && defined(__TIME__)
-    cliPrintF("\nBGC32 Firmware V%s, Build Date " __DATE__ " "__TIME__" \n", __BGC32_VERSION);
+#ifdef __VERSION__
+    cliPrintF("\ngcc version " __VERSION__ "\n");
+    cliPrintF("BGC32 Firmware V%s, Build Date " __DATE__ " "__TIME__" \n", __BGC32_VERSION);
 #endif
 
     if ((RCC->CR & RCC_CR_HSERDY) != RESET)

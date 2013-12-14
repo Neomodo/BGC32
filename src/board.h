@@ -48,6 +48,8 @@ along with EvvGC. If not, see <http://www.gnu.org/licenses/>.
 #include "stm32f10x.h"
 #include "stm32f10x_conf.h"
 
+#include "arm_math.h"
+
 #include "hw_config.h"
 #include "usb_lib.h"
 #include "usb_desc.h"
