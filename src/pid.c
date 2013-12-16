@@ -37,17 +37,11 @@ along with EvvGC. If not, see <http://www.gnu.org/licenses/>.
 
 uint8_t holdIntegrators = true;
 
-#define F_CUT 20.0f
-
-static float rc;
-
 ///////////////////////////////////////////////////////////////////////////////
 
 void initPID(void)
 {
     uint8_t index;
-
-    rc = 1.0f / ( TWO_PI * F_CUT );
 
     for (index = 0; index < NUMBER_OF_PIDS; index++)
     {
@@ -64,8 +58,6 @@ float updatePID(float command, float state, float deltaT, uint8_t iHold, struct 
 {
     float error;
     float dTerm;
-    float dTermFiltered;
-    float dAverage;
 
     ///////////////////////////////////
 
@@ -101,23 +93,14 @@ float updatePID(float command, float state, float deltaT, uint8_t iHold, struct 
 
     ///////////////////////////////////
 
-    dTermFiltered = PIDparameters->lastDterm + deltaT / (rc + deltaT) * (dTerm - PIDparameters->lastDterm);
-
-    dAverage = (dTermFiltered + PIDparameters->lastDterm + PIDparameters->lastLastDterm) * 0.333333f;
-
-    PIDparameters->lastLastDterm = PIDparameters->lastDterm;
-    PIDparameters->lastDterm = dTermFiltered;
-
-    ///////////////////////////////////
-
     if (PIDparameters->type == ANGULAR)
         return(PIDparameters->P * error                +
 	           PIDparameters->I * PIDparameters->iTerm +
-	           PIDparameters->D * dAverage);
+	           PIDparameters->D * dTerm);
     else
         return(PIDparameters->P * PIDparameters->B * command +
                PIDparameters->I * PIDparameters->iTerm       +
-               PIDparameters->D * dAverage                   -
+               PIDparameters->D * dTerm                   -
                PIDparameters->P * state);
 
     ///////////////////////////////////

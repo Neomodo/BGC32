@@ -203,6 +203,10 @@ typedef struct eepromConfig_t
     float   pitchAttPointingCmd50HzLowPassTau;
     float   yawAttPointingCmd50HzLowPassTau;
 
+    uint8_t rollReverse;
+    uint8_t pitchReverse;
+    uint8_t yawReverse;
+
 } eepromConfig_t;
 
 extern eepromConfig_t eepromConfig;

@@ -109,7 +109,7 @@ void SysTick_Handler(void)
     sysTickUptime++;
 
     if ((systemReady        == true)  &&
-            (mpu6050Calibrating == false)) // HJI && (magCalibrating     == false))
+        (mpu6050Calibrating == false)) // HJI && (magCalibrating     == false))
 
     {
         frameCounter++;

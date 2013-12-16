@@ -546,6 +546,16 @@ void cliCom(void)
                 cliQuery = 'x';
                 break;
 
+               ///////////////////////////////
+
+            case 'r': // Gimbal Axis Rotation Flags
+                cliPrintF("\nGimbal Roll Axis Rotation:  %s\n", eepromConfig.rollReverse  ? "Reverse" : "Normal");
+                cliPrintF(  "Gimbal Pitch Axis Rotation: %s\n", eepromConfig.pitchReverse ? "Reverse" : "Normal");
+                cliPrintF(  "Gimbal Yaw Axis Rotation:   %s\n", eepromConfig.yawReverse   ? "Reverse" : "Normal");
+
+                cliQuery = 'x';
+                break;
+
                 ///////////////////////////////
 
             case 's': // Raw Receiver Commands
@@ -591,8 +601,8 @@ void cliCom(void)
 
             case 'y':  // AutoPan Enable Status
                 cliPrintF("\nRoll AutoPan:  (Not Implemented)  %s\n", eepromConfig.rollAutoPanEnabled  ? "Enabled" : "Disabled");
-                cliPrintF("Pitch AutoPan: (Not Implemented)  %s\n",   eepromConfig.pitchAutoPanEnabled ? "Enabled" : "Disabled");
-                cliPrintF("Yaw AutoPan:                      %s\n",   eepromConfig.yawAutoPanEnabled   ? "Enabled" : "Disabled");
+                cliPrintF(  "Pitch AutoPan: (Not Implemented)  %s\n", eepromConfig.pitchAutoPanEnabled ? "Enabled" : "Disabled");
+                cliPrintF(  "Yaw AutoPan:   (Not Implemented)  %s\n", eepromConfig.yawAutoPanEnabled   ? "Enabled" : "Disabled");
 
                 cliQuery = 'x';
                 break;
@@ -743,6 +753,34 @@ void cliCom(void)
                 }
 
                 cliQuery = 'd';
+                validCliCommand = true;
+                break;
+
+                ///////////////////////////////
+
+            case 'G': // Read Gimbal Axis Rotation Flags
+                if (readStringCLI(tempString) == 3)
+                {
+                    token = strtok_r((char *)tempString, ";", &state);
+                    if (token != NULL)
+                        eepromConfig.rollReverse  = (uint8_t)stringToFloat((uint8_t *)token);
+
+                    token = strtok_r(NULL, ";", &state);
+                    if (token != NULL)
+                        eepromConfig.pitchReverse = (uint8_t)stringToFloat((uint8_t *)token);
+
+                    token = strtok_r(NULL, ";", &state);
+                    if (token != NULL)
+                        eepromConfig.yawReverse   = (uint8_t)stringToFloat((uint8_t *)token);
+
+                    cliPrintF("\nGimbal Axis Rotation Flags Received....\n");
+                }
+                else
+                {
+                    cliPrintF("\nInput Error\n");
+                }
+
+                cliQuery = 'r';
                 validCliCommand = true;
                 break;
 
@@ -1077,8 +1115,9 @@ void cliCom(void)
                     if (token != NULL)
                         eepromConfig.yawAutoPanEnabled   = (uint8_t)stringToFloat((uint8_t *)token);
 
-                    eepromConfig.rollAutoPanEnabled  = false;  // HJI Function not implemented yet
-                    eepromConfig.pitchAutoPanEnabled = false;  // HJI Function not implemented yet
+                    eepromConfig.rollAutoPanEnabled   = false;  // HJI Function not implemented yet
+                    eepromConfig.pitchAutoPanEnabled  = false;  // HJI Function not implemented yet
+                    eepromConfig.yawAutoPanEnabled    = false;  // HJI Function not implemented yet
 
                     cliPrintF("\nAutoPan Enable Flags Received....\n");
                 }
@@ -1121,7 +1160,7 @@ void cliCom(void)
                 cliPrintF("'d' RC Parameters                  'D' Set Roll RC Parameters       DResponse;Rate;Left Limit;Right Limit\n");
                 cliPrintF("'e' 500 Hz Accels                  'E' Set Pitch RC Parameters      EResponse;Rate;Down Limit;Up Limit\n");;
                 cliPrintF("'f' 500 Hz Gyros                   'F' Set Yaw RC Parameters        FResponse;Rate;Left Limit;Right Limit\n");
-                cliPrintF("'g' 10 hz Mag Data                 'G' Not Used\n");
+                cliPrintF("'g' 10 hz Mag Data                 'G' Set Axis Rotation Flags      GR;P;Y\n");
                 cliPrintF("'h' Attitudes                      'H' Not Used\n");
                 cliPrintF("'i' Gimbal Axis Enable Flags       'I' Set Gimbal Axis Enable Flags IR;P;Y\n");
                 cliPrintF("'j' Gimbal Axis Power Settings     'J' Set Gimbal Axis Power Levels JR;P;Y\n");
@@ -1148,7 +1187,7 @@ void cliCom(void)
                 cliPrintF("'o' Motor Pole Counts              'O' Set Motor Pole Counts        ORPC;PPC;YPC\n");
                 cliPrintF("'p' Counters                       'P' Sensor CLI\n");
                 cliPrintF("'q' Filter Time Constants          'Q' Set Roll Filters             QAtt;RateCmd;AttCmd\n");
-                cliPrintF("'r' Not Used                       'R' Reset and Enter Bootloader\n");
+                cliPrintF("'r' Gimbal Axis Rotation Flags     'R' Reset and Enter Bootloader\n");
                 cliPrintF("'s' Raw Receiver Commands          'S' Reset\n");
                 cliPrintF("'t' Pointing Commands              'T' Set Pitch Filters            TAtt;RateCmd;AttCmd\n");
                 cliPrintF("'u' PID Outputs                    'U' Set Yaw Filters              UAtt;RateCmd;AttCmd\n");
@@ -1172,7 +1211,7 @@ void cliCom(void)
 
                 cliPrintF("\n");
                 cliPrintF("'y' AutoPan Enbale Flags           'Y' Set AutoPan Enable Flags     YR;P;Y\n");
-                cliPrintF("'z' Not Used                       'Z' Toggle Gimbal Enable/Disable State\n");
+                cliPrintF("'z' Not Used                       'Z' Toggle CLI Enable/Disable State\n");
                 cliPrintF("'+' Increment Test Phase           '?' Command Summary\n");
                 cliPrintF("'-' Decrement Test Phase\n");
                 cliPrintF("\n");

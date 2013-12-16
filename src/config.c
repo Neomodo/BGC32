@@ -250,6 +250,10 @@ void checkFirstTime(bool eepromReset)
         eepromConfig.pitchAttPointingCmd50HzLowPassTau = 0.25f;
         eepromConfig.yawAttPointingCmd50HzLowPassTau   = 0.25f;
 
+        eepromConfig.rollReverse  = false;
+        eepromConfig.pitchReverse = false;
+        eepromConfig.yawReverse   = false;
+
         writeEEPROM();
     }
 }
