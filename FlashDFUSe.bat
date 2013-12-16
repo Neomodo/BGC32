@@ -1,8 +1,12 @@
 @echo off
-set filename=%1%
-set FLASHTOOL=setup\dfu-util-static.exe
+REM set filename=%1%
+REM set FLASHTOOL=setup\dfu-util-static.exe
+set FLASHTOOL="C:\Users\John Ihlein\Desktop\STM32workspace\BGC32\setup\dfu-util-static.exe"
 
-if "%filename%" == "" set filename=out\BGC32Gimbal.USB.bin
+arm-none-eabi-objcopy -O binary "C:\Users\John Ihlein\Desktop\STM32workspace\BGC32\Release\BGC32.elf" "C:\Users\John Ihlein\Desktop\STM32workspace\BGC32\Release\BGC32.bin"
+
+REM if "%filename%" == "" set filename=out\BGC32Gimbal.USB.bin
+set filename="C:\Users\John Ihlein\Desktop\STM32workspace\BGC32\Release\BGC32.bin"
 
 echo taking board into boot mode ...
 REM boot loader hack by ala42

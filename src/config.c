@@ -42,7 +42,7 @@ along with EvvGC. If not, see <http://www.gnu.org/licenses/>.
 // use the last KB for sensor config storage
 #define FLASH_WRITE_EEPROM_CONFIG_ADDR  (0x08000000 + (uint32_t)FLASH_PAGE_SIZE * (FLASH_PAGE_COUNT - 1))
 
-static uint8_t checkNewEEPROMConf = 10;
+static uint8_t checkNewEEPROMConf = 11;
 
 ///////////////////////////////////////////////////////////////////////////////
 
