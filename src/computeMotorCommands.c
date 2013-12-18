@@ -50,17 +50,105 @@ float pidCmdPrev[3] = { 0.0f, 0.0f, 0.0f };
 
 void computeMotorCommands(float dt)
 {
+	float rollCmdDiv2, pitchCmdDiv2, yawCmdDiv2;
+
+	float cosRollCmdDiv2,  sinRollCmdDiv2;
+	float cosPitchCmdDiv2, sinPitchCmdDiv2;
+	float cosYawCmdDiv2,   sinYawCmdDiv2;
+
+	float qRef[4];
+
+	float qMeasConjugate[4];
+
+	float qError[4];
+
+	float normR;
+
+	float qError0Squared, qError1Squared, qError2Squared, qError3Squared;
+
+	float axisError[3];
+
 	holdIntegrators = false;
 
 	///////////////////////////////////
 
-    if (activeRollState == true)
-    {
-    	pidCmd[ROLL] = updatePID(pointingCmd[ROLL] * mechanical2electricalDegrees[ROLL],
-    	               sensors.margAttitude500Hz[ROLL] * mechanical2electricalDegrees[ROLL],
-    	               dt, holdIntegrators, &eepromConfig.PID[ROLL_PID]);
+	rollCmdDiv2  = pointingCmd[ROLL ] / 2.0f;
+	pitchCmdDiv2 = pointingCmd[PITCH] / 2.0f;
+	yawCmdDiv2   = pointingCmd[YAW  ] / 2.0f;
 
-    	outputRate[ROLL] = pidCmd[ROLL] - pidCmdPrev[ROLL];
+	cosRollCmdDiv2  = cosf(rollCmdDiv2);
+	sinRollCmdDiv2  = sinf(rollCmdDiv2);
+
+	cosPitchCmdDiv2 = cosf(pitchCmdDiv2);
+	sinPitchCmdDiv2 = sinf(pitchCmdDiv2);
+
+	cosYawCmdDiv2   = cosf(yawCmdDiv2);
+	sinYawCmdDiv2   = sinf(yawCmdDiv2);
+
+	qRef[0] = ( cosRollCmdDiv2 * cosPitchCmdDiv2 * cosYawCmdDiv2 ) +
+    		  ( sinRollCmdDiv2 * sinPitchCmdDiv2 * sinYawCmdDiv2 );
+
+    qRef[1] = ( sinRollCmdDiv2 * cosPitchCmdDiv2 * cosYawCmdDiv2 ) -
+  		      ( cosRollCmdDiv2 * sinPitchCmdDiv2 * sinYawCmdDiv2 );
+
+    qRef[2] = ( cosRollCmdDiv2 * sinPitchCmdDiv2 * cosYawCmdDiv2 ) +
+  		      ( sinRollCmdDiv2 * cosPitchCmdDiv2 * sinYawCmdDiv2 );
+
+    qRef[3] = ( cosRollCmdDiv2 * cosPitchCmdDiv2 * sinYawCmdDiv2 ) -
+  		      ( sinRollCmdDiv2 * sinPitchCmdDiv2 * cosYawCmdDiv2 );
+
+    qMeasConjugate[0] =  qMeas[0];
+
+    qMeasConjugate[1] = -qMeas[1];
+
+    qMeasConjugate[2] = -qMeas[2];
+
+    qMeasConjugate[3] = -qMeas[3];
+
+    qError[0] = qRef[0] * qMeasConjugate[0] - qRef[1] * qMeasConjugate[1] -
+    		    qRef[2] * qMeasConjugate[2] - qRef[3] * qMeasConjugate[3];
+
+    qError[1] = qRef[0] * qMeasConjugate[1] + qRef[1] * qMeasConjugate[0] +
+    		    qRef[2] * qMeasConjugate[3] - qRef[3] * qMeasConjugate[2];
+
+    qError[2] = qRef[0] * qMeasConjugate[2] - qRef[1] * qMeasConjugate[3] +
+    		    qRef[2] * qMeasConjugate[0] + qRef[3] * qMeasConjugate[1];
+
+    qError[3] = qRef[0] * qMeasConjugate[3] + qRef[1] * qMeasConjugate[2] -
+    		    qRef[2] * qMeasConjugate[1] + qRef[3] * qMeasConjugate[0];
+
+    // normalize quaternion
+    normR = 1.0f / sqrt(qError[0] * qError[0] + qError[1] * qError[1] + qError[2] * qError[2] + qError[3] * qError[3]);
+
+    qError[0] *= normR;
+    qError[1] *= normR;
+    qError[2] *= normR;
+    qError[3] *= normR;
+
+    qError0Squared = qError[0] * qError[0];
+
+    qError1Squared = qError[1] * qError[1];
+
+    qError2Squared = qError[2] * qError[2];
+
+    qError3Squared = qError[3] * qError[3];
+
+    axisError[ROLL ] = atan2f(2.0f * (qError[0] * qError[1] + qError[2] * qError[3]),
+    		                  qError0Squared - qError1Squared - qError2Squared + qError3Squared);
+
+    axisError[PITCH] = asinf(2.0f * (qError[0] * qError[2] - qError[3] * qError[1]));
+
+    axisError[YAW  ] = atan2f(2.0f * (qError[0] * qError[3] + qError[1] * qError[2]),
+    		                  qError0Squared + qError1Squared - qError2Squared - qError3Squared);
+
+    ///////////////////////////////////
+
+	if (eepromConfig.rollEnabled == true)
+	{
+        pidCmd[ROLL] = updatePID(0.0f, axisError[ROLL] * mechanical2electricalDegrees[ROLL],
+	                             dt, holdIntegrators, &eepromConfig.PID[ROLL_PID]);
+
+	    outputRate[ROLL] = pidCmd[ROLL] - pidCmdPrev[ROLL];
 
 	    if (outputRate[ROLL] > eepromConfig.rateLimit)
 	        pidCmd[ROLL] = pidCmdPrev[ROLL] + eepromConfig.rateLimit;
@@ -75,10 +163,9 @@ void computeMotorCommands(float dt)
 
     ///////////////////////////////////
 
-    if (activePitchState == true)
+    if (eepromConfig.pitchEnabled == true)
     {
-        pidCmd[PITCH] = updatePID(pointingCmd[PITCH] * mechanical2electricalDegrees[PITCH],
-        		                  sensors.margAttitude500Hz[PITCH] * mechanical2electricalDegrees[PITCH],
+        pidCmd[PITCH] = updatePID(axisError[PITCH] * mechanical2electricalDegrees[PITCH], 0.0f,
                                   dt, holdIntegrators, &eepromConfig.PID[PITCH_PID]);
 
 	    outputRate[PITCH] = pidCmd[PITCH] - pidCmdPrev[PITCH];
@@ -96,10 +183,9 @@ void computeMotorCommands(float dt)
 
     ///////////////////////////////////
 
-    if (activeYawState == true)
+    if (eepromConfig.yawEnabled == true)
     {
-        pidCmd[YAW] = updatePID(pointingCmd[YAW] * mechanical2electricalDegrees[YAW],
-        		                sensors.margAttitude500Hz[YAW] * mechanical2electricalDegrees[YAW],
+        pidCmd[YAW] = updatePID(axisError[YAW] * mechanical2electricalDegrees[YAW], 0.0f,
                                 dt, holdIntegrators, &eepromConfig.PID[YAW_PID]);
 
 	    outputRate[YAW] = pidCmd[YAW] - pidCmdPrev[YAW];

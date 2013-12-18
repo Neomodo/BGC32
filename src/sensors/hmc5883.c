@@ -92,22 +92,39 @@ int16andUint8_t rawMag[3];
 
 uint8_t readMag(void)
 {
-    uint8_t I2C_Buffer_Rx[6];
+	uint8_t axis;
+
+	uint8_t I2C_Buffer_Rx[6];
+
+    int16_t straightMagData[3];
+    int16_t rotatedMagData[3];
 
     i2cRead(HMC5883_ADDRESS, HMC5883_DATA_X_MSB_REG, 6, I2C_Buffer_Rx);
 
-    rawMag[YAXIS].bytes[1] = I2C_Buffer_Rx[0];
-    rawMag[YAXIS].bytes[0] = I2C_Buffer_Rx[1];
+    rawMag[XAXIS].bytes[1] = I2C_Buffer_Rx[0];
+    rawMag[XAXIS].bytes[0] = I2C_Buffer_Rx[1];
     rawMag[ZAXIS].bytes[1] = I2C_Buffer_Rx[2];
     rawMag[ZAXIS].bytes[0] = I2C_Buffer_Rx[3];
-    rawMag[XAXIS].bytes[1] = I2C_Buffer_Rx[4];
-    rawMag[XAXIS].bytes[0] = I2C_Buffer_Rx[5];
+    rawMag[YAXIS].bytes[1] = I2C_Buffer_Rx[4];
+    rawMag[YAXIS].bytes[0] = I2C_Buffer_Rx[5];
+
+    rawMag[XAXIS].value = -rawMag[XAXIS].value;
 
     // check for valid data
     if (rawMag[XAXIS].value == -4096 || rawMag[YAXIS].value == -4096 || rawMag[ZAXIS].value == -4096)
         return false;
     else
+    {
+        for (axis = 0; axis < 3; axis++)
+            straightMagData[axis]  = rawMag[axis].value;
+
+        matrixMultiply(3, 3, 1, rotatedMagData,  orientationMatrix, straightMagData);
+
+        for (axis = 0; axis < 3; axis++)
+            rawMag[axis].value  = rotatedMagData[axis];
+
         return true;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

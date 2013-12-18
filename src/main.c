@@ -81,15 +81,15 @@ int main(void)
             deltaTime10Hz    = currentTime - previous10HzTime;
             previous10HzTime = currentTime;
 
-            // HJI if (newMagData == true)
-            // HJI {
-            // HJI     sensors.mag10Hz[XAXIS] =   (float)rawMag[XAXIS].value * magScaleFactor[XAXIS] - eepromConfig.magBias[XAXIS];
-            // HJI     sensors.mag10Hz[YAXIS] =   (float)rawMag[YAXIS].value * magScaleFactor[YAXIS] - eepromConfig.magBias[YAXIS];
-            // HJI     sensors.mag10Hz[ZAXIS] = -((float)rawMag[ZAXIS].value * magScaleFactor[ZAXIS] - eepromConfig.magBias[ZAXIS]);
+            if (newMagData == true)
+            {
+                sensors.mag10Hz[XAXIS] =   (float)rawMag[XAXIS].value * magScaleFactor[XAXIS] - eepromConfig.magBias[XAXIS];
+                sensors.mag10Hz[YAXIS] =   (float)rawMag[YAXIS].value * magScaleFactor[YAXIS] - eepromConfig.magBias[YAXIS];
+                sensors.mag10Hz[ZAXIS] = -((float)rawMag[ZAXIS].value * magScaleFactor[ZAXIS] - eepromConfig.magBias[ZAXIS]);
 
-            // HJI     newMagData = false;
-            // HJI     magDataUpdate = true;
-            // HJI }
+                newMagData = false;
+                magDataUpdate = true;
+            }
 
             cliCom();
 
@@ -136,10 +136,10 @@ int main(void)
             MargAHRSupdate(sensors.gyro500Hz[ROLL],   sensors.gyro500Hz[PITCH],  sensors.gyro500Hz[YAW],
                            sensors.accel500Hz[XAXIS], sensors.accel500Hz[YAXIS], sensors.accel500Hz[ZAXIS],
                            sensors.mag10Hz[XAXIS],    sensors.mag10Hz[YAXIS],    sensors.mag10Hz[ZAXIS],
-                           false,  //magDataUpdate,
+                           magDataUpdate,
                            dt500Hz);
 
-            //magDataUpdate = false;
+            magDataUpdate = false;
 
             computeMotorCommands(dt500Hz);
 

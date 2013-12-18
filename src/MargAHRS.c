@@ -102,9 +102,9 @@ void MargAHRSinit(float ax, float ay, float az, float mx, float my, float mz)
     cosPitch = cosf(initialPitch);
     sinPitch = sinf(initialPitch);
 
-    magX = 1.0f;  // HJI mx * cosPitch + my * sinRoll * sinPitch + mz * cosRoll * sinPitch;
+    magX = mx * cosPitch + my * sinRoll * sinPitch + mz * cosRoll * sinPitch;
 
-    magY = 0.0f;  // HJI my * cosRoll - mz * sinRoll;
+    magY = my * cosRoll - mz * sinRoll;
 
     initialHdg = atan2f(-magY, magX);
 
@@ -151,7 +151,7 @@ void MargAHRSupdate(float gx, float gy, float gz,
 
     //-------------------------------------------
 
-    if ((MargAHRSinitialized == false)) // HJI && (magDataUpdate == true))
+    if ((MargAHRSinitialized == false) && (magDataUpdate == true))
     {
         MargAHRSinit(ax, ay, az, mx, my, mz);
 

@@ -109,7 +109,8 @@ void SysTick_Handler(void)
     sysTickUptime++;
 
     if ((systemReady        == true)  &&
-        (mpu6050Calibrating == false)) // HJI && (magCalibrating     == false))
+        (mpu6050Calibrating == false) &&
+        (magCalibrating     == false))
 
     {
         frameCounter++;
@@ -156,8 +157,8 @@ void SysTick_Handler(void)
 
         ///////////////////////////////
 
-        // HJI if (((frameCounter + 1) % COUNT_10HZ) == 0)
-        // HJI     newMagData = readMag();
+        if (((frameCounter + 1) % COUNT_10HZ) == 0)
+            newMagData = readMag();
 
         if ((frameCounter % COUNT_10HZ) == 0)
             frame_10Hz = true;
@@ -330,7 +331,7 @@ void systemInit(void)
     orientIMU();
 
     initMPU6050();
-    // initMag();
+    initMag();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
