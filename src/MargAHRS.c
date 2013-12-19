@@ -288,6 +288,10 @@ void MargAHRSupdate(float gx, float gy, float gz,
         q2q3 = qMeas[2] * qMeas[3];
         q3q3 = qMeas[3] * qMeas[3];
 
+        // roll  = Mathf.Atan2(2*y*w - 2*x*z, 1 - 2*y*y - 2*z*z);
+        // pitch = Mathf.Atan2(2*x*w - 2*y*z, 1 - 2*x*x - 2*z*z);
+        // yaw   =  Mathf.Asin(2*x*y + 2*z*w);
+
         sensors.margAttitude500Hz[ROLL ] = atan2f( 2.0f * (q0q1 + q2q3), q0q0 - q1q1 - q2q2 + q3q3 );
 		sensors.margAttitude500Hz[PITCH] =  asinf( 2.0f * (q0q2 - q1q3) );
 		sensors.margAttitude500Hz[YAW  ] = atan2f( 2.0f * (q1q2 + q0q3), q0q0 + q1q1 - q2q2 - q3q3 );

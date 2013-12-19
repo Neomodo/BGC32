@@ -100,6 +100,7 @@ typedef volatile uint8_t semaphore_t;
 typedef struct sensors_t
 {
     float accel500Hz[3];
+    float evvgcCFAttitude500Hz[3];
     float margAttitude500Hz[3];
     float gyro500Hz[3];
     float mag10Hz[3];

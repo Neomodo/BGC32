@@ -78,6 +78,7 @@ along with EvvGC. If not, see <http://www.gnu.org/licenses/>.
 #include "cli.h"
 #include "computeMotorCommands.h"
 #include "config.h"
+#include "evvgcCF.h"
 #include "fastTrig.h"
 #include "firstOrderFilter.h"
 #include "magCalibration.h"

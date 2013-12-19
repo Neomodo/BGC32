@@ -454,6 +454,9 @@ void cliCom(void)
                                                    sensors.margAttitude500Hz[PITCH] * R2D,
                                                    sensors.margAttitude500Hz[YAW]   * R2D);
 
+                cliPrintF("%9.4f, %9.4f, %9.4f\n\n", sensors.evvgcCFAttitude500Hz[ROLL]  * R2D,
+                                                     sensors.evvgcCFAttitude500Hz[PITCH] * R2D,
+                                                     sensors.evvgcCFAttitude500Hz[YAW]   * R2D);
                 break;
 
                 ///////////////////////////////
