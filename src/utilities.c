@@ -1,35 +1,32 @@
 /*
-  Sept 2013
 
-  bgc32 Rev -
+BGC32 from FocusFlight, a new alternative firmware
+for the EvvGC controller
 
-  Copyright (c) 2013 John Ihlein.  All rights reserved.
+Original work Copyright (c) 2013 John Ihlein
+                                 Alan K. Adamson
 
-  Open Source STM32 Based Brushless Gimbal Controller Software
+This file is part of BGC32.
 
-  Includes code and/or ideas from:
+Includes code and/or ideas from:
 
-  1)AeroQuad
-  2)BaseFlight
-  3)CH Robotics
-  4)MultiWii
-  5)S.O.H. Madgwick
-  6)UAVX
+  1)BaseFlight
+  2)EvvGC
+  2)S.O.H. Madgwick
 
-  Designed to run on the EvvGC Brushless Gimbal Controller Board
+BGC32 is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+BGC32 is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with EvvGC. If not, see <http://www.gnu.org/licenses/>.
 
-  You should have received a copy of the GNU General Public License
-  along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -60,44 +57,23 @@ float constrain(float input, float minValue, float maxValue)
 
 void matrixMultiply(uint8_t aRows, uint8_t aCols_bRows, uint8_t bCols, int16_t matrixC[], int16_t matrixA[], int16_t matrixB[])
 {
-  uint8_t i,j,k;
+    uint8_t i, j, k;
 
-  for (i = 0; i < aRows * bCols; i++)
-  {
-    matrixC[i] = 0.0;
-  }
-
-  for (i = 0; i < aRows; i++)
-  {
-    for (j = 0; j < aCols_bRows; j++)
+    for (i = 0; i < aRows * bCols; i++)
     {
-      for (k = 0;  k < bCols; k++)
-      {
-       matrixC[i * bCols + k] += matrixA[i * aCols_bRows + j] * matrixB[j * bCols + k];
-      }
+        matrixC[i] = 0.0;
     }
-  }
-}
 
-///////////////////////////////////////////////////////////////////////////////
-// Rate Limit
-///////////////////////////////////////////////////////////////////////////////
-
-float rateLimit(float input, float pastInput, float limit)
-{
-    float stepSize;
-
-    stepSize = pastInput + limit;
-
-    if (input > stepSize)
-        return stepSize;
-
-    stepSize = pastInput - limit;
-
-    if (input < stepSize)
-        return stepSize;
-
-    return input;
+    for (i = 0; i < aRows; i++)
+    {
+        for (j = 0; j < aCols_bRows; j++)
+        {
+            for (k = 0;  k < bCols; k++)
+            {
+                matrixC[i * bCols + k] += matrixA[i * aCols_bRows + j] * matrixB[j * bCols + k];
+            }
+        }
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -346,7 +322,7 @@ float standardRadianFormat(float angle)
 #define white_space(c) ((c) == ' ' || (c) == '\t')
 #define valid_digit(c) ((c) >= '0' && (c) <= '9')
 
-float stringToFloat(const char *p)
+float stringToFloat(const uint8_t *p)
 {
     int frac = 0;
     double sign, value, scale;

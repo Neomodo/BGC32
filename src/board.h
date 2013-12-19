@@ -1,35 +1,32 @@
 /*
-  Sept 2013
 
-  bgc32 Rev -
+BGC32 from FocusFlight, a new alternative firmware
+for the EvvGC controller
 
-  Copyright (c) 2013 John Ihlein.  All rights reserved.
+Original work Copyright (c) 2013 John Ihlein
+                                 Alan K. Adamson
 
-  Open Source STM32 Based Brushless Gimbal Controller Software
+This file is part of BGC32.
 
-  Includes code and/or ideas from:
+Includes code and/or ideas from:
 
-  1)AeroQuad
-  2)BaseFlight
-  3)CH Robotics
-  4)MultiWii
-  5)S.O.H. Madgwick
-  6)UAVX
+  1)BaseFlight
+  2)EvvGC
+  2)S.O.H. Madgwick
 
-  Designed to run on the EvvGC Brushless Gimbal Controller Board
+BGC32 is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+BGC32 is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with EvvGC. If not, see <http://www.gnu.org/licenses/>.
 
-  You should have received a copy of the GNU General Public License
-  along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -51,6 +48,8 @@
 #include "stm32f10x.h"
 #include "stm32f10x_conf.h"
 
+#include "arm_math.h"
+
 #include "hw_config.h"
 #include "usb_lib.h"
 #include "usb_desc.h"
@@ -64,29 +63,28 @@
 
 #include "drv_cli.h"
 #include "drv_gpio.h"
-// HJI #include "drv_i2c.h"
-#include "drv_i2cSoft.h"
-// HJI #include "drv_pwmMotors.h"
-#include "drv_rx.h"
+#include "drv_i2c.h"
+#include "drv_irq.h"
+#include "drv_pwmMotors.h"
+#include "drv_rc.h"
 #include "drv_system.h"
 #include "drv_timingFunctions.h"
+#include "drv_usart.h"
+#include "ringbuffer.h"
 
 #include "hmc5883.h"
 #include "mpu6050.h"
 
 #include "cli.h"
-// HJI #include "computeMotorCommands.h"
+#include "computeMotorCommands.h"
 #include "config.h"
+#include "evvgcCF.h"
 #include "fastTrig.h"
 #include "firstOrderFilter.h"
 #include "magCalibration.h"
-// HJI #include "MargAHRS.h"
+#include "MargAHRS.h"
 #include "mpu6050Calibration.h"
 #include "pointingCommands.h"
 #include "utilities.h"
-
-#include "engine.h"  // HJI
-#include "pins.h"    // HJI
-#include "pwm.h"     // HJI
 
 ///////////////////////////////////////////////////////////////////////////////

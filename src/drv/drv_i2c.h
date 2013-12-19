@@ -31,30 +31,26 @@ along with EvvGC. If not, see <http://www.gnu.org/licenses/>.
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "board.h"
+#pragma once
 
 ///////////////////////////////////////////////////////////////////////////////
-// Initialize GPIO
+
+void i2cInit(I2C_TypeDef *I2Cx);
+
 ///////////////////////////////////////////////////////////////////////////////
 
-void gpioInit(void)
-{
-    GPIO_InitTypeDef  GPIO_InitStructure;
+bool i2cWriteBuffer(uint8_t addr_, uint8_t reg_, uint8_t len_, uint8_t *data);
 
-    GPIO_InitStructure.GPIO_Pin   = LED1_PIN;
-    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+///////////////////////////////////////////////////////////////////////////////
 
-    GPIO_Init(LED1_GPIO, &GPIO_InitStructure);
+bool i2cWrite(uint8_t addr_, uint8_t reg, uint8_t data);
 
-    GPIO_InitStructure.GPIO_Pin   = LED2_PIN;
-    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+///////////////////////////////////////////////////////////////////////////////
 
-    GPIO_Init(LED2_GPIO, &GPIO_InitStructure);
+bool i2cRead(uint8_t addr_, uint8_t reg, uint8_t len, uint8_t *buf);
 
-    LED1_OFF;
-    LED2_OFF;
-}
+///////////////////////////////////////////////////////////////////////////////
+
+uint16_t i2cGetErrorCounter(void);
 
 ///////////////////////////////////////////////////////////////////////////////

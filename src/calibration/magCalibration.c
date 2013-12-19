@@ -1,35 +1,32 @@
 /*
-  Sept 2013
 
-  bgc32 Rev -
+BGC32 from FocusFlight, a new alternative firmware
+for the EvvGC controller
 
-  Copyright (c) 2013 John Ihlein.  All rights reserved.
+Original work Copyright (c) 2013 John Ihlein
+                                 Alan K. Adamson
 
-  Open Source STM32 Based Brushless Gimbal Controller Software
+This file is part of BGC32.
 
-  Includes code and/or ideas from:
+Includes code and/or ideas from:
 
-  1)AeroQuad
-  2)BaseFlight
-  3)CH Robotics
-  4)MultiWii
-  5)S.O.H. Madgwick
-  6)UAVX
+  1)BaseFlight
+  2)EvvGC
+  2)S.O.H. Madgwick
 
-  Designed to run on the EvvGC Brushless Gimbal Controller Board
+BGC32 is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+BGC32 is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with EvvGC. If not, see <http://www.gnu.org/licenses/>.
 
-  You should have received a copy of the GNU General Public License
-  along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -46,50 +43,50 @@ uint8_t magCalibrating = false;
 
 void magCalibration(void)
 {
-	uint16_t calibrationCounter = 0;
-	uint16_t population[2][3];
+    uint16_t calibrationCounter = 0;
+    uint16_t population[2][3];
 
-	float    d[600][3];       // 600 Samples = 60 seconds of data at 10 Hz
-	float    sphereOrigin[3];
-	float    sphereRadius;
+    float    d[600][3];       // 600 Samples = 60 seconds of data at 10 Hz
+    float    sphereOrigin[3];
+    float    sphereRadius;
 
-	magCalibrating = true;
+    magCalibrating = true;
 
-	cliPrint("\nMagnetometer Calibration:\n\n");
+    cliPrintF("\nMagnetometer Calibration:\n\n");
 
-    cliPrint("Rotate magnetometer around all axes multiple times\n");
-    cliPrint("Must complete within 60 seconds....\n\n");
-    cliPrint("  Send a character when ready to begin and another when complete\n\n");
+    cliPrintF("Rotate magnetometer around all axes multiple times\n");
+    cliPrintF("Must complete within 60 seconds....\n\n");
+    cliPrintF("  Send a character when ready to begin and another when complete\n\n");
 
     while (cliAvailable() == false);
 
-    cliPrint("  Start rotations.....\n");
+    cliPrintF("  Start rotations.....\n");
 
-    cliRead();
+    getChar();
 
     while ((cliAvailable() == false) && (calibrationCounter < 600))
-	{
-		if (readMag() == true)
-		{
-			d[calibrationCounter][XAXIS] = (float)rawMag[XAXIS].value * magScaleFactor[XAXIS];
-			d[calibrationCounter][YAXIS] = (float)rawMag[YAXIS].value * magScaleFactor[YAXIS];
-			d[calibrationCounter][ZAXIS] = (float)rawMag[ZAXIS].value * magScaleFactor[ZAXIS];
+    {
+        if (readMag() == true)
+        {
+            d[calibrationCounter][XAXIS] = (float)rawMag[XAXIS].value * magScaleFactor[XAXIS];
+            d[calibrationCounter][YAXIS] = (float)rawMag[YAXIS].value * magScaleFactor[YAXIS];
+            d[calibrationCounter][ZAXIS] = (float)rawMag[ZAXIS].value * magScaleFactor[ZAXIS];
 
-			calibrationCounter++;
-		}
+            calibrationCounter++;
+        }
 
-		delay(100);
-	}
+        delay(100);
+    }
 
-	cliPrintF("\n\nMagnetometer Bias Calculation, %3ld samples collected out of 600 max)\n", calibrationCounter);
+    cliPrintF("\n\nMagnetometer Bias Calculation, %3ld samples collected out of 600 max)\n", calibrationCounter);
 
-	sphereFit(d, calibrationCounter, 100, 0.0f, population, sphereOrigin, &sphereRadius);
+    sphereFit(d, calibrationCounter, 100, 0.0f, population, sphereOrigin, &sphereRadius);
 
-	eepromConfig.magBias[XAXIS] = sphereOrigin[XAXIS];
-	eepromConfig.magBias[YAXIS] = sphereOrigin[YAXIS];
-	eepromConfig.magBias[ZAXIS] = sphereOrigin[ZAXIS];
+    eepromConfig.magBias[XAXIS] = sphereOrigin[XAXIS];
+    eepromConfig.magBias[YAXIS] = sphereOrigin[YAXIS];
+    eepromConfig.magBias[ZAXIS] = sphereOrigin[ZAXIS];
 
-	magCalibrating = false;
+    magCalibrating = false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

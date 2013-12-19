@@ -1,35 +1,32 @@
 /*
-  Sept 2013
 
-  bgc32 Rev -
+BGC32 from FocusFlight, a new alternative firmware
+for the EvvGC controller
 
-  Copyright (c) 2013 John Ihlein.  All rights reserved.
+Original work Copyright (c) 2013 John Ihlein
+                                 Alan K. Adamson
 
-  Open Source STM32 Based Brushless Gimbal Controller Software
+This file is part of BGC32.
 
-  Includes code and/or ideas from:
+Includes code and/or ideas from:
 
-  1)AeroQuad
-  2)BaseFlight
-  3)CH Robotics
-  4)MultiWii
-  5)S.O.H. Madgwick
-  6)UAVX
+  1)BaseFlight
+  2)EvvGC
+  2)S.O.H. Madgwick
 
-  Designed to run on the EvvGC Brushless Gimbal Controller Board
+BGC32 is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+BGC32 is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with EvvGC. If not, see <http://www.gnu.org/licenses/>.
 
-  You should have received a copy of the GNU General Public License
-  along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -95,22 +92,39 @@ int16andUint8_t rawMag[3];
 
 uint8_t readMag(void)
 {
-    uint8_t I2C_Buffer_Rx[6];
+	uint8_t axis;
+
+	uint8_t I2C_Buffer_Rx[6];
+
+    int16_t straightMagData[3];
+    int16_t rotatedMagData[3];
 
     i2cRead(HMC5883_ADDRESS, HMC5883_DATA_X_MSB_REG, 6, I2C_Buffer_Rx);
 
-    rawMag[YAXIS].bytes[1] = I2C_Buffer_Rx[0];
-    rawMag[YAXIS].bytes[0] = I2C_Buffer_Rx[1];
+    rawMag[XAXIS].bytes[1] = I2C_Buffer_Rx[0];
+    rawMag[XAXIS].bytes[0] = I2C_Buffer_Rx[1];
     rawMag[ZAXIS].bytes[1] = I2C_Buffer_Rx[2];
     rawMag[ZAXIS].bytes[0] = I2C_Buffer_Rx[3];
-    rawMag[XAXIS].bytes[1] = I2C_Buffer_Rx[4];
-    rawMag[XAXIS].bytes[0] = I2C_Buffer_Rx[5];
+    rawMag[YAXIS].bytes[1] = I2C_Buffer_Rx[4];
+    rawMag[YAXIS].bytes[0] = I2C_Buffer_Rx[5];
+
+    rawMag[XAXIS].value = -rawMag[XAXIS].value;
 
     // check for valid data
-	if (rawMag[XAXIS].value == -4096 || rawMag[YAXIS].value == -4096 || rawMag[ZAXIS].value == -4096)
-	    return false;
-	else
-	    return true;
+    if (rawMag[XAXIS].value == -4096 || rawMag[YAXIS].value == -4096 || rawMag[ZAXIS].value == -4096)
+        return false;
+    else
+    {
+        for (axis = 0; axis < 3; axis++)
+            straightMagData[axis]  = rawMag[axis].value;
+
+        matrixMultiply(3, 3, 1, rotatedMagData,  orientationMatrix, straightMagData);
+
+        for (axis = 0; axis < 3; axis++)
+            rawMag[axis].value  = rotatedMagData[axis];
+
+        return true;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -134,11 +148,11 @@ void initMag(void)
 
     for (i = 0; i < 10; i++)
     {
-    	i2cWrite(HMC5883_ADDRESS, HMC5883_MODE_REG, OP_MODE_SINGLE);
+        i2cWrite(HMC5883_ADDRESS, HMC5883_MODE_REG, OP_MODE_SINGLE);
 
         delay(20);
 
-        while ( (I2C_Buffer_Rx[0] & STATUS_RDY) == 0x00 )
+        while ((I2C_Buffer_Rx[0] & STATUS_RDY) == 0x00)
             i2cRead(HMC5883_ADDRESS, HMC5883_STATUS_REG, 1, I2C_Buffer_Rx);
 
         readMag();

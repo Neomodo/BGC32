@@ -1,35 +1,32 @@
 /*
-  Sept 2013
 
-  bgc32 Rev -
+BGC32 from FocusFlight, a new alternative firmware
+for the EvvGC controller
 
-  Copyright (c) 2013 John Ihlein.  All rights reserved.
+Original work Copyright (c) 2013 John Ihlein
+                                 Alan K. Adamson
 
-  Open Source STM32 Based Brushless Gimbal Controller Software
+This file is part of BGC32.
 
-  Includes code and/or ideas from:
+Includes code and/or ideas from:
 
-  1)AeroQuad
-  2)BaseFlight
-  3)CH Robotics
-  4)MultiWii
-  5)S.O.H. Madgwick
-  6)UAVX
+  1)BaseFlight
+  2)EvvGC
+  2)S.O.H. Madgwick
 
-  Designed to run on the EvvGC Brushless Gimbal Controller Board
+BGC32 is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+BGC32 is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with EvvGC. If not, see <http://www.gnu.org/licenses/>.
 
-  You should have received a copy of the GNU General Public License
-  along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -57,13 +54,14 @@ void mpu6050Calibration(void)
 
     mpu6050Calibrating = true;
 
-    cliPrint("\nMPU6050 Calibration:\n");
+    cliPrintF("\nMPU6050 Calibration:\n");
 
     ///////////////////////////////////
     // Get samples at temperature1
     ///////////////////////////////////
 
-    cliPrint("\nBegin 1st MPU6050 Measurements...\n");
+    cliPrintF("\nBegin 1st MPU6050 Measurements...\n");
+
     for (index = 0; index < numberOfSamples; index++)
     {
         readMPU6050();
@@ -76,7 +74,7 @@ void mpu6050Calibration(void)
         gyroBias1[ROLL ]     += rawGyro[ROLL ].value;
         gyroBias1[PITCH]     += rawGyro[PITCH].value;
         gyroBias1[YAW  ]     += rawGyro[YAW  ].value;
-        mpu6050Temperature1  += (float) (rawMPU6050Temperature.value) / 340.0f + 35.0f;
+        mpu6050Temperature1  += (float)(rawMPU6050Temperature.value) / 340.0f + 35.0f;
 
         delayMicroseconds(sampleRate);
     }
@@ -91,21 +89,22 @@ void mpu6050Calibration(void)
 
     cliPrintF("\nGyro Temperature Reading: %6.2f", mpu6050Temperature1);
 
-    cliPrint("\n\nEnd 1st MPU6050 Measurements\n");
+    cliPrintF("\n\nEnd 1st MPU6050 Measurements\n");
 
     ///////////////////////////////////
     // Time delay for temperature
     // Stabilization
     ///////////////////////////////////
 
-    cliPrint("\nWaiting for 10 minutes for MPU6050 temp to rise...\n");
+    cliPrintF("\nWaiting for 10 minutes for MPU6050 temp to rise...\n");
     delay(600000);    // Number of mSec in 10 minutes
 
     ///////////////////////////////////
     // Get samples at temperature2
     ///////////////////////////////////
 
-    cliPrint("\nBegin 2nd MPU6050 Measurements...\n");
+    cliPrintF("\nBegin 2nd MPU6050 Measurements...\n");
+
     for (index = 0; index < numberOfSamples; index++)
     {
         readMPU6050();
@@ -133,7 +132,7 @@ void mpu6050Calibration(void)
 
     cliPrintF("\nGyro Temperature Reading: %6.2f", mpu6050Temperature2);
 
-    cliPrint("\n\nEnd 2st MPU6050 Measurements\n");
+    cliPrintF("\n\nEnd 2st MPU6050 Measurements\n");
 
     ///////////////////////////////////
 
@@ -155,7 +154,7 @@ void mpu6050Calibration(void)
 
     ///////////////////////////////////
 
-    cliPrint("\nMPU6050 Calibration Complete.\n\n");
+    cliPrintF("\nMPU6050 Calibration Complete.\n\n");
 
     mpu6050Calibrating = false;
 }

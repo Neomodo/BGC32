@@ -31,30 +31,19 @@ along with EvvGC. If not, see <http://www.gnu.org/licenses/>.
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#include "board.h"
+#pragma once
 
 ///////////////////////////////////////////////////////////////////////////////
-// Initialize GPIO
+
+extern float mechanical2electricalDegrees[3];
+extern float electrical2mechanicalDegrees[3];
+
+extern float pidCmd[3];
+
+///////////////////////////////////////////////////////////////////////////////
+// Compute Motor Commands
 ///////////////////////////////////////////////////////////////////////////////
 
-void gpioInit(void)
-{
-    GPIO_InitTypeDef  GPIO_InitStructure;
-
-    GPIO_InitStructure.GPIO_Pin   = LED1_PIN;
-    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-
-    GPIO_Init(LED1_GPIO, &GPIO_InitStructure);
-
-    GPIO_InitStructure.GPIO_Pin   = LED2_PIN;
-    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-
-    GPIO_Init(LED2_GPIO, &GPIO_InitStructure);
-
-    LED1_OFF;
-    LED2_OFF;
-}
+void computeMotorCommands(float dt);
 
 ///////////////////////////////////////////////////////////////////////////////

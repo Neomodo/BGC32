@@ -1,36 +1,32 @@
 /*
-  December 2012
 
-  aq32Plus_F3 Rev -
+BGC32 from FocusFlight, a new alternative firmware
+for the EvvGC controller
 
-  Copyright (c) 2012 John Ihlein.  All rights reserved.
+Original work Copyright (c) 2013 John Ihlein
+                                 Alan K. Adamson
 
-  Open Source STM32 Based Multicopter Controller Software
+This file is part of BGC32.
 
-  Includes code and/or ideas from:
+Includes code and/or ideas from:
 
-  1)AeroQuad
-  2)BaseFlight
-  3)CH Robotics
-  4)MultiWii
-  5)S.O.H. Madgwick
-  6)UAVX
-  7)STM DiscoveryF3 demonstration software
+  1)BaseFlight
+  2)EvvGC
+  2)S.O.H. Madgwick
 
-  Designed to run on the DiscoveryF3 board
+BGC32 is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+BGC32 is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with EvvGC. If not, see <http://www.gnu.org/licenses/>.
 
-  You should have received a copy of the GNU General Public License
-  along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -41,16 +37,11 @@
 
 uint8_t holdIntegrators = true;
 
-#define F_CUT 20.0f
-float rc;
-
 ///////////////////////////////////////////////////////////////////////////////
 
 void initPID(void)
 {
     uint8_t index;
-
-    rc = 1.0f / ( TWO_PI * F_CUT );
 
     for (index = 0; index < NUMBER_OF_PIDS; index++)
     {
@@ -67,8 +58,6 @@ float updatePID(float command, float state, float deltaT, uint8_t iHold, struct 
 {
     float error;
     float dTerm;
-    // HJI float dTermFiltered;
-    // HJI float dAverage;
 
     ///////////////////////////////////
 
@@ -104,23 +93,15 @@ float updatePID(float command, float state, float deltaT, uint8_t iHold, struct 
 
     ///////////////////////////////////
 
-    // HJI dTermFiltered = PIDparameters->lastDterm + (deltaT / (rc + deltaT)) * (dTerm - PIDparameters->lastDterm);
-
-    // HJI dAverage = (dTermFiltered + PIDparameters->lastDterm + PIDparameters->lastLastDterm) * 0.333333f;
-
-    // HJI PIDparameters->lastLastDterm = PIDparameters->lastDterm;
-    // HJI PIDparameters->lastDterm = dTermFiltered;
-
-    ///////////////////////////////////
-
     if (PIDparameters->type == ANGULAR)
         return(PIDparameters->P * error                +
 	           PIDparameters->I * PIDparameters->iTerm +
-	           PIDparameters->D * dTerm); // HJI dAverage);
+	           PIDparameters->D * dTerm);
     else
-        return(PIDparameters->P * ((PIDparameters->B * command) - state) +
-               PIDparameters->I * PIDparameters->iTerm +
-               PIDparameters->D * dTerm); // HJI dAverage);
+        return(PIDparameters->P * PIDparameters->B * command +
+               PIDparameters->I * PIDparameters->iTerm       +
+               PIDparameters->D * dTerm                   -
+               PIDparameters->P * state);
 
     ///////////////////////////////////
 }

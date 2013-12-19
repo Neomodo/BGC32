@@ -1,35 +1,32 @@
 /*
-  Sept 2013
 
-  bgc32 Rev -
+BGC32 from FocusFlight, a new alternative firmware
+for the EvvGC controller
 
-  Copyright (c) 2013 John Ihlein.  All rights reserved.
+Original work Copyright (c) 2013 John Ihlein
+                                 Alan K. Adamson
 
-  Open Source STM32 Based Brushless Gimbal Controller Software
+This file is part of BGC32.
 
-  Includes code and/or ideas from:
+Includes code and/or ideas from:
 
-  1)AeroQuad
-  2)BaseFlight
-  3)CH Robotics
-  4)MultiWii
-  5)S.O.H. Madgwick
-  6)UAVX
+  1)BaseFlight
+  2)EvvGC
+  2)S.O.H. Madgwick
 
-  Designed to run on the EvvGC Brushless Gimbal Controller Board
+BGC32 is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+BGC32 is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with EvvGC. If not, see <http://www.gnu.org/licenses/>.
 
-  You should have received a copy of the GNU General Public License
-  along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -104,81 +101,90 @@ void SysTick_Handler(void)
 {
     uint32_t currentTime;
 
+#ifdef _DTIMING
+    LA1_ENABLE;
+#endif
+
     sysTickCycleCounter = *DWT_CYCCNT;
     sysTickUptime++;
 
     if ((systemReady        == true)  &&
-    	(mpu6050Calibrating == false)) // HJI && (magCalibrating     == false))
+        (mpu6050Calibrating == false) &&
+        (magCalibrating     == false))
 
+    {
+        frameCounter++;
+
+        if (frameCounter > FRAME_COUNT)
+            frameCounter = 1;
+
+        ///////////////////////////////
+
+        currentTime = micros();
+        deltaTime1000Hz = currentTime - previous1000HzTime;
+        previous1000HzTime = currentTime;
+
+        ///////////////////////////////
+
+        if ((frameCounter % COUNT_500HZ) == 0)
         {
-            frameCounter++;
-            if (frameCounter > FRAME_COUNT)
-                frameCounter = 1;
+            frame_500Hz = true;
 
-            ///////////////////////////////
+            readMPU6050();
 
-            currentTime = micros();
-            deltaTime1000Hz = currentTime - previous1000HzTime;
-            previous1000HzTime = currentTime;
+            accelData500Hz[XAXIS] = rawAccel[XAXIS].value;
+            accelData500Hz[YAXIS] = rawAccel[YAXIS].value;
+            accelData500Hz[ZAXIS] = rawAccel[ZAXIS].value;
 
-            ///////////////////////////////
-
-            if (((frameCounter + 1) % COUNT_500HZ) == 0)
-            {
-                readMPU6050();
-
-                accelData500Hz[XAXIS] = rawAccel[XAXIS].value;
-                accelData500Hz[YAXIS] = rawAccel[YAXIS].value;
-                accelData500Hz[ZAXIS] = rawAccel[ZAXIS].value;
-
-                gyroData500Hz[ROLL ] = rawGyro[ROLL ].value;
-                gyroData500Hz[PITCH] = rawGyro[PITCH].value;
-                gyroData500Hz[YAW  ] = rawGyro[YAW  ].value;
-            }
-
-            if ((frameCounter % COUNT_500HZ) == 0)
-            {
-                frame_500Hz = true;
-            }
-
-            ///////////////////////////////
-
-            if ((frameCounter % COUNT_100HZ) == 0)
-            {
-                frame_100Hz = true;
-            }
-
-            ///////////////////////////////
-
-            if ((frameCounter % COUNT_50HZ) == 0)
-            {
-                frame_50Hz = true;
-            }
-
-            ///////////////////////////////
-
-            // HJI if (((frameCounter + 1) % COUNT_10HZ) == 0)
-            // HJI     newMagData = readMag();
-
-            if ((frameCounter % COUNT_10HZ) == 0)
-                frame_10Hz = true;
-
-            ///////////////////////////////
-
-            if ((frameCounter % COUNT_5HZ) == 0)
-                frame_5Hz = true;
-
-            ///////////////////////////////
-
-            if ((frameCounter % COUNT_1HZ) == 0)
-                frame_1Hz = true;
-
-            ///////////////////////////////////
-
-            executionTime1000Hz = micros() - currentTime;
-
-            ///////////////////////////////
+            gyroData500Hz[ROLL ] = rawGyro[ROLL ].value;
+            gyroData500Hz[PITCH] = rawGyro[PITCH].value;
+            gyroData500Hz[YAW  ] = rawGyro[YAW  ].value;
         }
+
+        ///////////////////////////////
+
+        if ((frameCounter % COUNT_100HZ) == 0)
+        {
+            frame_100Hz = true;
+        }
+
+        ///////////////////////////////
+
+        if ((frameCounter % COUNT_50HZ) == 0)
+        {
+            frame_50Hz = true;
+        }
+
+        ///////////////////////////////
+
+        // if (((frameCounter + 1) % COUNT_10HZ) == 0)
+        //     newMagData = readMag();
+        newMagData = false;
+
+        if ((frameCounter % COUNT_10HZ) == 0)
+            frame_10Hz = true;
+
+        ///////////////////////////////
+
+        if ((frameCounter % COUNT_5HZ) == 0)
+            frame_5Hz = true;
+
+        ///////////////////////////////
+
+        if ((frameCounter % COUNT_1HZ) == 0)
+            frame_1Hz = true;
+
+        ///////////////////////////////////
+
+        executionTime1000Hz = micros() - currentTime;
+
+        ///////////////////////////////
+    }
+
+#ifdef _DTIMING
+    LA1_DISABLE;
+#endif
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -200,7 +206,7 @@ uint32_t micros(void)
         cycle = *DWT_CYCCNT;
         oldCycle = sysTickCycleCounter;
     }
-    while ( __STREXW( timeMs , &sysTickUptime ) );
+    while (__STREXW(timeMs , &sysTickUptime));
 
     return (timeMs * 1000) + (cycle - oldCycle) / usTicks;
 }
@@ -215,12 +221,37 @@ uint32_t millis(void)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Set up loop timing pins
+///////////////////////////////////////////////////////////////////////////////
+
+#ifdef _DTIMING
+void timingSetup(void)
+{
+    GPIO_InitTypeDef GPIO_InitStructure;
+
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC,   ENABLE);
+
+    GPIO_StructInit(&GPIO_InitStructure);
+
+    // Init pins
+    GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_2 | GPIO_Pin_3;
+    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+
+    GPIO_Init(GPIOC, &GPIO_InitStructure);
+
+    LA2_DISABLE;
+    LA1_DISABLE;
+}
+#endif
+
+///////////////////////////////////////////////////////////////////////////////
 // System Initialization
 ///////////////////////////////////////////////////////////////////////////////
 
 void systemInit(void)
 {
-	// Init cycle counter
+    // Init cycle counter
     cycleCounterInit();
 
     // SysTick
@@ -230,13 +261,12 @@ void systemInit(void)
                            RCC_APB2Periph_GPIOC | RCC_APB2Periph_AFIO  |
                            RCC_APB2Periph_TIM1  | RCC_APB2Periph_TIM8, ENABLE);
 
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2  | RCC_APB1Periph_TIM3  |
-                           RCC_APB1Periph_TIM4  | RCC_APB1Periph_TIM5  |
-                           RCC_APB1Periph_TIM6, ENABLE);
-    //HJI                       RCC_APB1Periph_TIM6  | RCC_APB1Periph_I2C2, ENABLE);
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3  | RCC_APB1Periph_TIM4  |
+                           RCC_APB1Periph_TIM5  | RCC_APB1Periph_TIM6  | RCC_APB1Periph_I2C2, ENABLE);
 
-    GPIO_PinRemapConfig(GPIO_Remap_SWJ_NoJTRST, ENABLE);
-    GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);  // JTAG-DP Disabled and SW-DP Enabled
+#ifdef _DTIMING
+    timingSetup();
+#endif
 
     ///////////////////////////////////////////////////////////////////////////
 
@@ -245,22 +275,52 @@ void systemInit(void)
 
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);  // 2 bits for pre-emption priority, 2 bits for subpriority
 
-    // HJI pwmMotorDriverInit();
-
-    GPIO_Config();  // HJI
-    PWMConfig();    // HJI
+    pwmMotorDriverInit();
 
     cliInit();
     gpioInit();
 
     LED2_ON;
 
-    delay(20000);  // 20 sec delay for sensor stabilization - probably not long enough.....
+    delay(10000);  // 10 seconds of 20 second delay for sensor stabilization
+
+    if (GetVCPConnectMode() != eVCPConnectReset)
+    {
+        cliPrintF("\r\nUSB startup delay...\r\n");
+        delay(3000);
+
+        if (GetVCPConnectMode() == eVCPConnectData)
+        {
+            cliPrintF("\r\nBGC32 firmware starting up, USB connected...\r\n");
+        }
+    }
+    else
+    {
+        cliPrintF("\r\nDelaying for usb/serial driver to settle\r\n");
+        delay(3000);
+        cliPrintF("\r\nBGC32 firmware starting up, serial active...\r\n");
+    }
+
+#ifdef __VERSION__
+    cliPrintF("\ngcc version " __VERSION__ "\n");
+    cliPrintF("BGC32 Firmware V%s, Build Date " __DATE__ " "__TIME__" \n", __BGC32_VERSION);
+#endif
+
+    if ((RCC->CR & RCC_CR_HSERDY) != RESET)
+    {
+        cliPrintF("\nRunning on external HSE clock, clock rate is %dMHz\n", SystemCoreClock / 1000000);
+    }
+    else
+    {
+        cliPrintF("\nERROR: Running on internal HSI clock, clock rate is %dMHz\n", SystemCoreClock / 1000000);
+    }
+
+    delay(10000);  // Remaining 10 seconds of 20 second delay for sensor stabilization - probably not long enough..
 
     LED1_ON;
 
     i2cInit(I2C2);
-    rxInit();
+    rcInit();
     timingFunctionsInit();
 
     BKPInit();
@@ -272,7 +332,7 @@ void systemInit(void)
     orientIMU();
 
     initMPU6050();
-    // initMag();
+    initMag();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -284,7 +344,8 @@ void delayMicroseconds(uint32_t us)
     uint32_t elapsed = 0;
     uint32_t lastCount = *DWT_CYCCNT;
 
-    for (;;) {
+    for (;;)
+    {
         register uint32_t current_count = *DWT_CYCCNT;
         uint32_t elapsed_us;
 
@@ -294,6 +355,7 @@ void delayMicroseconds(uint32_t us)
 
         // convert to microseconds
         elapsed_us = elapsed / usTicks;
+
         if (elapsed_us >= us)
             break;
 
@@ -388,3 +450,9 @@ void reboot(void)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+void _init(void) __attribute__((weak));
+void _init(void)
+{
+    ;
+}

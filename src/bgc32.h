@@ -1,35 +1,32 @@
 /*
-  Sept 2013
 
-  bgc32 Rev -
+BGC32 from FocusFlight, a new alternative firmware
+for the EvvGC controller
 
-  Copyright (c) 2013 John Ihlein.  All rights reserved.
+Original work Copyright (c) 2013 John Ihlein
+                                 Alan K. Adamson
 
-  Open Source STM32 Based Brushless Gimbal Controller Software
+This file is part of BGC32.
 
-  Includes code and/or ideas from:
+Includes code and/or ideas from:
 
-  1)AeroQuad
-  2)BaseFlight
-  3)CH Robotics
-  4)MultiWii
-  5)S.O.H. Madgwick
-  6)UAVX
+  1)BaseFlight
+  2)EvvGC
+  2)S.O.H. Madgwick
 
-  Designed to run on the EvvGC Brushless Gimbal Controller Board
+BGC32 is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+BGC32 is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  GNU General Public License for more details.
+You should have received a copy of the GNU General Public License
+along with EvvGC. If not, see <http://www.gnu.org/licenses/>.
 
-  You should have received a copy of the GNU General Public License
-  along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -38,7 +35,11 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#define     PI 3.14159265f
+#define __BGC32_VERSION "1.0"
+
+///////////////////////////////////////////////////////////////////////////////
+
+// AKA replaced with arm_math include #define     PI 3.14159265f
 #define TWO_PI 6.28318531f
 
 #define D2R  (PI / 180.0f)
@@ -46,8 +47,6 @@
 #define R2D  (180.0f / PI)
 
 #define SQR(x)  ((x) * (x))
-
-extern char    numberString[12];
 
 extern float   testPhase;
 extern float   testPhaseDelta;
@@ -72,17 +71,20 @@ extern float   testPhaseDelta;
 // Misc Type Definitions
 ///////////////////////////////////////////////////////////////////////////////
 
-typedef union {
+typedef union
+{
     int16_t value;
     uint8_t bytes[2];
 } int16andUint8_t;
 
-typedef union {
+typedef union
+{
     int32_t value;
     uint8_t bytes[4];
 } int32andUint8_t;
 
-typedef union {
+typedef union
+{
     uint16_t value;
     uint8_t bytes[2];
 } uint16andUint8_t;
@@ -98,7 +100,8 @@ typedef volatile uint8_t semaphore_t;
 typedef struct sensors_t
 {
     float accel500Hz[3];
-    float attitude500Hz[3];
+    float evvgcCFAttitude500Hz[3];
+    float margAttitude500Hz[3];
     float gyro500Hz[3];
     float mag10Hz[3];
 
@@ -162,9 +165,48 @@ typedef struct eepromConfig_t
     uint8_t pitchEnabled;
     uint8_t yawEnabled;
 
+    uint8_t rollAutoPanEnabled;
+    uint8_t pitchAutoPanEnabled;
+    uint8_t yawAutoPanEnabled;
+
     uint8_t imuOrientation;
 
+    float   rollMotorPoles;
+    float   pitchMotorPoles;
+    float   yawMotorPoles;
+
     float   rateLimit;
+
+    uint8_t rollRateCmdInput;
+    uint8_t pitchRateCmdInput;
+    uint8_t yawRateCmdInput;
+
+    float   gimbalRollRate;
+    float   gimbalPitchRate;
+    float   gimbalYawRate;
+
+    float   gimbalRollLeftLimit;
+    float   gimbalRollRightLimit;
+    float   gimbalPitchDownLimit;
+    float   gimbalPitchUpLimit;
+    float   gimbalYawLeftLimit;
+    float   gimbalYawRightLimit;
+
+    float   accelX500HzLowPassTau;
+    float   accelY500HzLowPassTau;
+    float   accelZ500HzLowPassTau;
+
+    float   rollRatePointingCmd50HzLowPassTau;
+    float   pitchRatePointingCmd50HzLowPassTau;
+    float   yawRatePointingCmd50HzLowPassTau;
+
+    float   rollAttPointingCmd50HzLowPassTau;
+    float   pitchAttPointingCmd50HzLowPassTau;
+    float   yawAttPointingCmd50HzLowPassTau;
+
+    uint8_t rollReverse;
+    uint8_t pitchReverse;
+    uint8_t yawReverse;
 
 } eepromConfig_t;
 
