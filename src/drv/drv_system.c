@@ -157,8 +157,9 @@ void SysTick_Handler(void)
 
         ///////////////////////////////
 
-        if (((frameCounter + 1) % COUNT_10HZ) == 0)
-            newMagData = readMag();
+        // if (((frameCounter + 1) % COUNT_10HZ) == 0)
+        //     newMagData = readMag();
+        newMagData = false;
 
         if ((frameCounter % COUNT_10HZ) == 0)
             frame_10Hz = true;

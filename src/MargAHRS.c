@@ -151,7 +151,7 @@ void MargAHRSupdate(float gx, float gy, float gz,
 
     //-------------------------------------------
 
-    if ((MargAHRSinitialized == false) && (magDataUpdate == true))
+    if ((MargAHRSinitialized == false)) // && (magDataUpdate == true))
     {
         MargAHRSinit(ax, ay, az, mx, my, mz);
 

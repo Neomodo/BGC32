@@ -145,7 +145,8 @@ void computeMotorCommands(float dt)
 
 	if (eepromConfig.rollEnabled == true)
 	{
-        pidCmd[ROLL] = updatePID(0.0f, axisError[ROLL] * mechanical2electricalDegrees[ROLL],
+        pidCmd[ROLL] = updatePID(pointingCmd[ROLL] * mechanical2electricalDegrees[ROLL],
+        		                 sensors.evvgcCFAttitude500Hz[ROLL] * mechanical2electricalDegrees[ROLL],
 	                             dt, holdIntegrators, &eepromConfig.PID[ROLL_PID]);
 
 	    outputRate[ROLL] = pidCmd[ROLL] - pidCmdPrev[ROLL];
@@ -165,7 +166,8 @@ void computeMotorCommands(float dt)
 
     if (eepromConfig.pitchEnabled == true)
     {
-        pidCmd[PITCH] = updatePID(axisError[PITCH] * mechanical2electricalDegrees[PITCH], 0.0f,
+        pidCmd[PITCH] = updatePID(pointingCmd[PITCH] * mechanical2electricalDegrees[PITCH],
+        		                  sensors.evvgcCFAttitude500Hz[PITCH] * mechanical2electricalDegrees[PITCH],
                                   dt, holdIntegrators, &eepromConfig.PID[PITCH_PID]);
 
 	    outputRate[PITCH] = pidCmd[PITCH] - pidCmdPrev[PITCH];
@@ -185,7 +187,8 @@ void computeMotorCommands(float dt)
 
     if (eepromConfig.yawEnabled == true)
     {
-        pidCmd[YAW] = updatePID(axisError[YAW] * mechanical2electricalDegrees[YAW], 0.0f,
+        pidCmd[YAW] = updatePID(pointingCmd[YAW] * mechanical2electricalDegrees[YAW],
+        		                sensors.evvgcCFAttitude500Hz[YAW] * mechanical2electricalDegrees[YAW],
                                 dt, holdIntegrators, &eepromConfig.PID[YAW_PID]);
 
 	    outputRate[YAW] = pidCmd[YAW] - pidCmdPrev[YAW];
