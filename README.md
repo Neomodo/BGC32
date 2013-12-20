@@ -9,7 +9,8 @@ STM32F1 processor supported currently, F4 version is in the works
 #### WARNING: you must *NEVER* flash new firmware over UART1 when you have any form
 of LIPO connected to the controller. Doing so will damage your controller!!!
 
-#### this source is buildable either via Makefile included or and Eclipse project
+
+### NOTICE: This source is buildable either via Makefile included or and Eclipse project
 specifics on the eclipe project will be forthcoming
 
 #### CLI instructions ####
