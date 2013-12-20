@@ -43,7 +43,7 @@ OUT_DIR = out
 CXX_DEFS = -DSTM32F10X_HD
 
 # C definitions
-C_DEFS = -DSTM32F10X_HD -DUSE_STDPERIPH_DRIVER
+C_DEFS = -DSTM32F10X_HD -DUSE_STDPERIPH_DRIVER -DARM_MATH_CM3 -D_DTIMING
 #C_DEFS += -DDISABLE_PA10
 #C_DEFS += -DUSB_DISC_DEV=GPIOD -DUSB_DISC_PIN=GPIO_Pin_11 -DUSB_DISC_RCC=RCC_APB2Periph_GPIOA
 
@@ -65,11 +65,11 @@ INC_DIRS = src Libraries \
 
 # library directories (absolute or relative paths to additional folders with
 # libraries)
-LIB_DIRS =
+LIB_DIRS = Libraries/CMSIS/Lib/GCC
 
 # libraries (additional libraries for linking, e.g. "-lm -lsome_name" to link
 # math library libm.a and libsome_name.a)
-LIBS =
+LIBS = -lm -larm_cortexM3l_math
 
 # additional directories with source files (absolute or relative paths to
 # folders with source files, current folder is always included)
@@ -160,13 +160,13 @@ C_FLAGS += -fsingle-precision-constant
 AS_FLAGS = -Wa,-amhls=$(OUT_DIR_F)$(notdir $(<:.$(AS_EXT)=.lst))
 
 # flags for linker
-LD_FLAGS = -T$(LD_SCRIPT) -g -Wl,-Map=$(OUT_DIR_F)$(PROJECT).map,--cref,--no-warn-mismatch
-LD_USB_FLAGS = -T$(LD_USB_SCRIPT) -g -Wl,-Map=$(OUT_DIR_F)$(PROJECT_USB).map,--cref,--no-warn-mismatch
+LD_FLAGS = -T$(LD_SCRIPT) -Wl,-Map=$(OUT_DIR_F)$(PROJECT).map,--cref,--no-warn-mismatch
+LD_USB_FLAGS = -T$(LD_USB_SCRIPT) -Wl,-Map=$(OUT_DIR_F)$(PROJECT_USB).map,--cref,--no-warn-mismatch
 
 # process option for removing unused code
 ifeq ($(REMOVE_UNUSED), 1)
-	LD_FLAGS += -Wl,--gc-sections
-	LD_USB_FLAGS += -Wl,--gc-sections
+	LD_FLAGS += -Xlinker --gc-sections
+	LD_USB_FLAGS += -Xlinker --gc-sections
 	OPTIMIZATION += -ffunction-sections -fdata-sections
 endif
 
@@ -176,8 +176,8 @@ endif
 ifeq ($(USES_CXX), 1)
 	AS_DEFS += -D__USES_CXX
 else
-#	LD_FLAGS += -nostartfiles
-#	LD_USB_FLAGS += -nostartfiles
+	LD_FLAGS += -nostartfiles
+	LD_USB_FLAGS += -nostartfiles
 endif
 
 #=============================================================================#
