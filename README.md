@@ -3,15 +3,12 @@ BGC32
 
 Open source Alternative firmware for EvvGC 3 Axis Gimbal controller
 
-#### NOTICE: NOT FUNCTIONAL!!! - BUILDABLE, currently in TESTING, runs on both 1.2 and 1.3 hardware
-STM32F1 processor supported currently, F4 version is in the works
+#### NOTICE: NOT FUNCTIONAL!!! - BUILDABLE, currently in TESTING, runs on both 1.2 and 1.3 hardware STM32F1 processor supported currently, F4 version is in the works
 
-#### WARNING: you must *NEVER* flash new firmware over UART1 when you have any form
-of LIPO connected to the controller. Doing so will damage your controller!!!
+#### WARNING: you must *NEVER* flash new firmware over UART1 when you have any form of LIPO connected to the controller. Doing so will damage your controller!!!
 
 
-### NOTICE: This source is buildable either via Makefile included or and Eclipse project
-specifics on the eclipe project will be forthcoming
+#### NOTICE: This source is buildable either via Makefile included or and Eclipse project specifics on the eclipe project will be forthcoming
 
 #### CLI instructions ####
 The CLI is accessable over the USB port after you install the ST VCP driver
