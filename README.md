@@ -20,17 +20,17 @@ To access the CLI, you connect Putty or other equivalent terminal program to
 the controller over the USB VCP port.
 
 To use Putty, you need to configure a connection as follows.
-  a) start Putty
-  b) on the session startup screen that pops up
-  b.1) select serial
-  b.2) enter the serial port number
-  b.3) baud doesn't matter
-  b.4) click the "terminal" on the left tree
-  b.4.1) click "Implicit CR in every LF"
-  b.4.2) click "local echo "force on""
-  b.5) click the keyboard under terminal
-  b.5.1) change the backspace to the control-h
-  b.6) go back to the session branch on the left and name and save
+1. start Putty
+2. on the session startup screen that pops up
+  1. select serial
+  2. enter the serial port number
+  3. baud doesn't matter
+  4. click the "terminal" on the left tree
+    1. click "Implicit CR in every LF"
+    2. click "local echo "force on""
+  5. click the keyboard under terminal
+    1. change the backspace to the control-h
+  6. go back to the session branch on the left and name and save
 
 Some of the basic 'single letter' commands (these do not require a carriage return)
 'Z' - toggles the CLI on and off.  This also toggles the state of the motors from off to whatever
@@ -57,9 +57,9 @@ This file is part of BGC32.
 
 Includes code and/or ideas from:
 
-  1)BaseFlight
-  2)EvvGC
-  2)S.O.H. Madgwick
+  1. BaseFlight
+  2. EvvGC
+  3. S.O.H. Madgwick
 
 BGC32 is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
