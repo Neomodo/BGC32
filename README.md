@@ -36,7 +36,7 @@ they were prior (default is all off) - for not the motors have to be off while t
 
 '?' - help for the CLI commands
 
-lowercase letters - these are mostly reporting commmands, they do not set parameters.
+lowercase letters - these are mostly reporting commmands, they do not set parameters...
 uppercase letters - these are mostly change commands and they do set parameters.
 
 The format for most parameter setting commands is <command letter><value><semi-colon>..
