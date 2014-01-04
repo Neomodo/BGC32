@@ -31,19 +31,62 @@ along with EvvGC. If not, see <http://www.gnu.org/licenses/>.
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#pragma once
+#include "board.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 
-extern float mechanical2electricalDegrees[3];
-extern float electrical2mechanicalDegrees[3];
+void initPDF(void)
+{
+    uint8_t index;
 
-extern float motorCmd[3];
+    for (index = 0; index < NUMBER_OF_PDFS; index++)
+    {
+    	eepromConfig.PDF[index].iTerm = 0.0f;
+	}
+}
 
 ///////////////////////////////////////////////////////////////////////////////
-// Compute Motor Commands
+
+float updatePDF(float command, float state, float deltaT, uint8_t iHold, struct PDFdata *PDFparameters)
+{
+    float error;
+
+    ///////////////////////////////////
+
+    error = command - state;
+
+    ///////////////////////////////////
+
+    if (iHold == false)
+    {
+    	PDFparameters->iTerm += error * deltaT;
+    	PDFparameters->iTerm = constrain(PDFparameters->iTerm, -PDFparameters->windupGuard, PDFparameters->windupGuard);
+    }
+
+    ///////////////////////////////////
+
+    return(PDFparameters->I * PDFparameters->iTerm - PDFparameters->P * state);
+
+    ///////////////////////////////////
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
-void computeMotorCommands(float dt);
+void setPDFintegralError(uint8_t IDPid, float value)
+{
+	eepromConfig.PID[IDPid].iTerm = value;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
+
+void zeroPDFintegralError(void)
+{
+    uint8_t index;
+
+    for (index = 0; index < NUMBER_OF_PIDS; index++)
+         setPIDintegralError(index, 0.0f);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+

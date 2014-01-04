@@ -578,9 +578,9 @@ void cliCom(void)
                 ///////////////////////////////
 
             case 'u': // PID Outputs
-                cliPrintF("%12.4f, %12.4f, %12.4f\n", pidCmd[ROLL],
-                                                      pidCmd[PITCH],
-                                                      pidCmd[YAW]);
+                cliPrintF("%12.4f, %12.4f, %12.4f\n", motorCmd[ROLL],
+                                                      motorCmd[PITCH],
+                                                      motorCmd[YAW]);
                 break;
 
                 ///////////////////////////////
@@ -610,6 +610,13 @@ void cliCom(void)
                 cliQuery = 'x';
                 break;
 
+                ///////////////////////////////
+
+            case 'z':
+                cliPrintF("%5.2f, %5.2f\n", adcAux1Value(),
+                            		        adcAux2Value());
+                break;
+
                 ///////////////////////////////////////////////////////////////////////
                 ///////////////////////////////////////////////////////////////////////
                 ///////////////////////////////////////////////////////////////////////
@@ -621,6 +628,10 @@ void cliCom(void)
                 if (readCliPID(ROLL_PID, tempString))
                 {
                     cliPrintF("\nRoll Rate PID Received....\n");
+
+                    eepromConfig.PDF[ROLL_PDF].P           = eepromConfig.PID[ROLL_PID].P;
+                    eepromConfig.PDF[ROLL_PDF].I           = eepromConfig.PID[ROLL_PID].I;
+                    eepromConfig.PDF[ROLL_PDF].windupGuard = eepromConfig.PID[ROLL_PID].windupGuard;
                 }
                 else
                 {
@@ -637,6 +648,10 @@ void cliCom(void)
                 if (readCliPID(PITCH_PID, tempString))
                 {
                     cliPrintF("\nPitch Rate PID Received....\n");
+
+                    eepromConfig.PDF[PITCH_PDF].P           = eepromConfig.PID[PITCH_PID].P;
+                    eepromConfig.PDF[PITCH_PDF].I           = eepromConfig.PID[PITCH_PID].I;
+                    eepromConfig.PDF[PITCH_PDF].windupGuard = eepromConfig.PID[PITCH_PID].windupGuard;
                 }
                 else
                 {
@@ -653,6 +668,10 @@ void cliCom(void)
                 if (readCliPID(YAW_PID, tempString))
                 {
                     cliPrintF("\nYaw Rate PID Received....\n");
+
+                    eepromConfig.PDF[YAW_PDF].P           = eepromConfig.PID[YAW_PID].P;
+                    eepromConfig.PDF[YAW_PDF].I           = eepromConfig.PID[YAW_PID].I;
+                    eepromConfig.PDF[YAW_PDF].windupGuard = eepromConfig.PID[YAW_PID].windupGuard;
                 }
                 else
                 {

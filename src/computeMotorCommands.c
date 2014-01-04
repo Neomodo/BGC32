@@ -40,9 +40,9 @@ float electrical2mechanicalDegrees[3] = { 1.0f, 1.0f, 1.0f };
 
 float outputRate[3];
 
-float pidCmd[3];
+float motorCmd[3];
 
-float pidCmdPrev[3] = { 0.0f, 0.0f, 0.0f };
+float motorCmdPrev[3] = { 0.0f, 0.0f, 0.0f };
 
 ///////////////////////////////////////////////////////////////////////////////
 // Compute Motor Commands
@@ -145,63 +145,90 @@ void computeMotorCommands(float dt)
 
 	if (eepromConfig.rollEnabled == true)
 	{
-        pidCmd[ROLL] = updatePID(pointingCmd[ROLL] * mechanical2electricalDegrees[ROLL],
-        		                 sensors.evvgcCFAttitude500Hz[ROLL] * mechanical2electricalDegrees[ROLL],
-	                             dt, holdIntegrators, &eepromConfig.PID[ROLL_PID]);
+        if (false)
+        {
+			motorCmd[ROLL] = updatePID(pointingCmd[ROLL] * mechanical2electricalDegrees[ROLL],
+          		                       sensors.evvgcCFAttitude500Hz[ROLL] * mechanical2electricalDegrees[ROLL],
+	                                   dt, holdIntegrators, &eepromConfig.PID[ROLL_PID]);
+		}
+		else
+		{
+            motorCmd[ROLL] = updatePDF(pointingCmd[ROLL] * mechanical2electricalDegrees[ROLL],
+        		                       sensors.evvgcCFAttitude500Hz[ROLL] * mechanical2electricalDegrees[ROLL],
+	                                   dt, holdIntegrators, &eepromConfig.PDF[ROLL_PDF]);
+	    }
 
-	    outputRate[ROLL] = pidCmd[ROLL] - pidCmdPrev[ROLL];
+	    outputRate[ROLL] = motorCmd[ROLL] - motorCmdPrev[ROLL];
 
 	    if (outputRate[ROLL] > eepromConfig.rateLimit)
-	        pidCmd[ROLL] = pidCmdPrev[ROLL] + eepromConfig.rateLimit;
+	        motorCmd[ROLL] = motorCmdPrev[ROLL] + eepromConfig.rateLimit;
 
 	    if (outputRate[ROLL] < -eepromConfig.rateLimit)
-	        pidCmd[ROLL] = pidCmdPrev[ROLL] - eepromConfig.rateLimit;
+	        motorCmd[ROLL] = motorCmdPrev[ROLL] - eepromConfig.rateLimit;
 
-	    pidCmdPrev[ROLL] = pidCmd[ROLL];
+	    motorCmdPrev[ROLL] = motorCmd[ROLL];
 
-	    setRollMotor(pidCmd[ROLL], (int)eepromConfig.rollPower);
+	    setRollMotor(motorCmd[ROLL], (int)eepromConfig.rollPower);
     }
 
     ///////////////////////////////////
 
     if (eepromConfig.pitchEnabled == true)
     {
-        pidCmd[PITCH] = updatePID(pointingCmd[PITCH] * mechanical2electricalDegrees[PITCH],
-        		                  sensors.evvgcCFAttitude500Hz[PITCH] * mechanical2electricalDegrees[PITCH],
-                                  dt, holdIntegrators, &eepromConfig.PID[PITCH_PID]);
+        if (false)
+        {
+			motorCmd[PITCH] = updatePID(pointingCmd[PITCH] * mechanical2electricalDegrees[PITCH],
+            		                    sensors.evvgcCFAttitude500Hz[PITCH] * mechanical2electricalDegrees[PITCH],
+                                        dt, holdIntegrators, &eepromConfig.PID[PITCH_PID]);
+	    }
+	    else
+        {
+            motorCmd[PITCH] = updatePDF(pointingCmd[PITCH] * mechanical2electricalDegrees[PITCH],
+            		                    sensors.evvgcCFAttitude500Hz[PITCH] * mechanical2electricalDegrees[PITCH],
+                                        dt, holdIntegrators, &eepromConfig.PDF[PITCH_PDF]);
+	    }
 
-	    outputRate[PITCH] = pidCmd[PITCH] - pidCmdPrev[PITCH];
+	    outputRate[PITCH] = motorCmd[PITCH] - motorCmdPrev[PITCH];
 
 	    if (outputRate[PITCH] > eepromConfig.rateLimit)
-	        pidCmd[PITCH] = pidCmdPrev[PITCH] + eepromConfig.rateLimit;
+	        motorCmd[PITCH] = motorCmdPrev[PITCH] + eepromConfig.rateLimit;
 
 	    if (outputRate[PITCH] < -eepromConfig.rateLimit)
-	        pidCmd[PITCH] = pidCmdPrev[PITCH] - eepromConfig.rateLimit;
+	        motorCmd[PITCH] = motorCmdPrev[PITCH] - eepromConfig.rateLimit;
 
-	    pidCmdPrev[PITCH] = pidCmd[PITCH];
+	    motorCmdPrev[PITCH] = motorCmd[PITCH];
 
-	    setPitchMotor(pidCmd[PITCH], (int)eepromConfig.pitchPower);
+	    setPitchMotor(motorCmd[PITCH], (int)eepromConfig.pitchPower);
     }
 
     ///////////////////////////////////
 
     if (eepromConfig.yawEnabled == true)
     {
-        pidCmd[YAW] = updatePID(pointingCmd[YAW] * mechanical2electricalDegrees[YAW],
-        		                sensors.evvgcCFAttitude500Hz[YAW] * mechanical2electricalDegrees[YAW],
-                                dt, holdIntegrators, &eepromConfig.PID[YAW_PID]);
+        if (false)
+        {
+			motorCmd[YAW] = updatePID(pointingCmd[YAW] * mechanical2electricalDegrees[YAW],
+        	    	                  sensors.evvgcCFAttitude500Hz[YAW] * mechanical2electricalDegrees[YAW],
+                                      dt, holdIntegrators, &eepromConfig.PID[YAW_PID]);
+	    }
+	    else
+	    {
+            motorCmd[YAW] = updatePDF(pointingCmd[YAW] * mechanical2electricalDegrees[YAW],
+                		              sensors.evvgcCFAttitude500Hz[YAW] * mechanical2electricalDegrees[YAW],
+                                      dt, holdIntegrators, &eepromConfig.PDF[YAW_PDF]);
+		}
 
-	    outputRate[YAW] = pidCmd[YAW] - pidCmdPrev[YAW];
+	    outputRate[YAW] = motorCmd[YAW] - motorCmdPrev[YAW];
 
 	    if (outputRate[YAW] > eepromConfig.rateLimit)
-	        pidCmd[YAW] = pidCmdPrev[YAW] + eepromConfig.rateLimit;
+	        motorCmd[YAW] = motorCmdPrev[YAW] + eepromConfig.rateLimit;
 
 	    if (outputRate[YAW] < -eepromConfig.rateLimit)
-	        pidCmd[YAW] = pidCmdPrev[YAW] - eepromConfig.rateLimit;
+	        motorCmd[YAW] = motorCmdPrev[YAW] - eepromConfig.rateLimit;
 
-	    pidCmdPrev[YAW] = pidCmd[YAW];
+	    motorCmdPrev[YAW] = motorCmd[YAW];
 
-        setYawMotor(pidCmd[YAW], (int)eepromConfig.yawPower);
+        setYawMotor(motorCmd[YAW], (int)eepromConfig.yawPower);
     }
 
     ///////////////////////////////////

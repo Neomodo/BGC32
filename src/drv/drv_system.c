@@ -251,6 +251,10 @@ void timingSetup(void)
 
 void systemInit(void)
 {
+    RCC_ClocksTypeDef rccClocks;
+
+    ///////////////////////////////////
+
     // Init cycle counter
     cycleCounterInit();
 
@@ -263,6 +267,8 @@ void systemInit(void)
 
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3  | RCC_APB1Periph_TIM4  |
                            RCC_APB1Periph_TIM5  | RCC_APB1Periph_TIM6  | RCC_APB1Periph_I2C2, ENABLE);
+
+    RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
 
 #ifdef _DTIMING
     timingSetup();
@@ -279,6 +285,7 @@ void systemInit(void)
 
     cliInit();
     gpioInit();
+    adcInit();
 
     LED2_ON;
 
@@ -303,17 +310,26 @@ void systemInit(void)
 
 #ifdef __VERSION__
     cliPrintF("\ngcc version " __VERSION__ "\n");
-    cliPrintF("BGC32 Firmware V%s, Build Date " __DATE__ " "__TIME__" \n", __BGC32_VERSION);
 #endif
+
+    cliPrintF("BGC32 Firmware V%s, Build Date " __DATE__ " "__TIME__" \n", __BGC32_VERSION);
 
     if ((RCC->CR & RCC_CR_HSERDY) != RESET)
     {
-        cliPrintF("\nRunning on external HSE clock, clock rate is %dMHz\n", SystemCoreClock / 1000000);
+        cliPrintF("\nRunning on external HSE clock....\n");
     }
     else
     {
-        cliPrintF("\nERROR: Running on internal HSI clock, clock rate is %dMHz\n", SystemCoreClock / 1000000);
+        cliPrintF("\nERROR: Running on internal HSI clock....\n");
     }
+
+    RCC_GetClocksFreq(&rccClocks);
+
+    cliPrintF("\nADCCLK-> %2d MHz\n",   rccClocks.ADCCLK_Frequency / 1000000);
+    cliPrintF(  "HCLK->   %2d MHz\n",   rccClocks.HCLK_Frequency   / 1000000);
+    cliPrintF(  "PCLK1->  %2d MHz\n",   rccClocks.PCLK1_Frequency  / 1000000);
+    cliPrintF(  "PCLK2->  %2d MHz\n",   rccClocks.PCLK2_Frequency  / 1000000);
+    cliPrintF(  "SYSCLK-> %2d MHz\n\n", rccClocks.SYSCLK_Frequency / 1000000);
 
     delay(10000);  // Remaining 10 seconds of 20 second delay for sensor stabilization - probably not long enough..
 

@@ -42,7 +42,7 @@ along with EvvGC. If not, see <http://www.gnu.org/licenses/>.
 // use the last KB for sensor config storage
 #define FLASH_WRITE_EEPROM_CONFIG_ADDR  (0x08000000 + (uint32_t)FLASH_PAGE_SIZE * (FLASH_PAGE_COUNT - 1))
 
-static uint8_t checkNewEEPROMConf = 11;
+static uint8_t checkNewEEPROMConf = 12;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -70,9 +70,9 @@ void readEEPROM(void)
     }
     else
     {
-        activeRollState = false;
+        activeRollState  = false;
         activePitchState = false;
-        activeYawState = false;
+        activeYawState   = false;
     }
 }
 
@@ -164,6 +164,20 @@ void checkFirstTime(bool eepromReset)
         ///////////////////////////////
 
         eepromConfig.midCommand = 3000.0f;
+
+        ///////////////////////////////
+
+        eepromConfig.PDF[ROLL_PDF].P               =   10.0f;
+        eepromConfig.PDF[ROLL_PDF].I               =    5.0f;
+        eepromConfig.PID[ROLL_PDF].windupGuard     = 1000.0f;
+
+        eepromConfig.PDF[PITCH_PDF].P              =   10.0f;
+        eepromConfig.PDF[PITCH_PDF].I              =    5.0f;
+        eepromConfig.PID[PITCH_PDF].windupGuard    = 1000.0f;
+
+        eepromConfig.PDF[YAW_PDF].P                =   10.0f;
+        eepromConfig.PDF[YAW_PDF].I                =    5.0f;
+        eepromConfig.PID[YAW_PDF].windupGuard      = 1000.0f;
 
         ///////////////////////////////
 

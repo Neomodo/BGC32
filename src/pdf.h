@@ -35,58 +35,31 @@ along with EvvGC. If not, see <http://www.gnu.org/licenses/>.
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#include <stdbool.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <math.h>
-#include <ctype.h>
-#include <string.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <errno.h>
-
-#include "stm32f10x.h"
-#include "stm32f10x_conf.h"
-
-#include "arm_math.h"
-
-#include "hw_config.h"
-#include "usb_lib.h"
-#include "usb_desc.h"
-#include "usb_pwr.h"
-
-///////////////////////////////////////
-
-#include "pdf.h"
-#include "pid.h"
-
-#include "bgc32.h"
-
-#include "drv_adc.h"
-#include "drv_cli.h"
-#include "drv_gpio.h"
-#include "drv_i2c.h"
-#include "drv_irq.h"
-#include "drv_pwmMotors.h"
-#include "drv_rc.h"
-#include "drv_system.h"
-#include "drv_timingFunctions.h"
-#include "drv_usart.h"
-#include "ringbuffer.h"
-
-#include "hmc5883.h"
-#include "mpu6050.h"
-
-#include "cli.h"
-#include "computeMotorCommands.h"
-#include "config.h"
-#include "evvgcCF.h"
-#include "fastTrig.h"
-#include "firstOrderFilter.h"
-#include "magCalibration.h"
-#include "MargAHRS.h"
-#include "mpu6050Calibration.h"
-#include "pointingCommands.h"
-#include "utilities.h"
+// PDF Variables
+typedef struct PDFdata
+{
+    float   P, I;
+    float   iTerm;
+    float   windupGuard;
+} PDFdata_t;
 
 ///////////////////////////////////////////////////////////////////////////////
+
+void initPDF(void);
+
+///////////////////////////////////////////////////////////////////////////////
+
+float updatePDF(float command, float state, float deltaT, uint8_t iHold, struct PDFdata *PDFparameters);
+
+///////////////////////////////////////////////////////////////////////////////
+
+void setPDFintegralError(uint8_t IDPdf, float value);
+
+///////////////////////////////////////////////////////////////////////////////
+
+void zeroPDFintegralError(void);
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+
