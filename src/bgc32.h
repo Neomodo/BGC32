@@ -220,6 +220,8 @@ typedef struct eepromConfig_t
     uint8_t pitchReverse;
     uint8_t yawReverse;
 
+    uint8_t pidController;
+
 } eepromConfig_t;
 
 extern eepromConfig_t eepromConfig;

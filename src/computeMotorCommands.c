@@ -145,7 +145,7 @@ void computeMotorCommands(float dt)
 
 	if (eepromConfig.rollEnabled == true)
 	{
-        if (false)
+        if (eepromConfig.pidController == true)
         {
 			motorCmd[ROLL] = updatePID(pointingCmd[ROLL] * mechanical2electricalDegrees[ROLL],
           		                       sensors.evvgcCFAttitude500Hz[ROLL] * mechanical2electricalDegrees[ROLL],
@@ -175,7 +175,7 @@ void computeMotorCommands(float dt)
 
     if (eepromConfig.pitchEnabled == true)
     {
-        if (false)
+        if (eepromConfig.pidController == true)
         {
 			motorCmd[PITCH] = updatePID(pointingCmd[PITCH] * mechanical2electricalDegrees[PITCH],
             		                    sensors.evvgcCFAttitude500Hz[PITCH] * mechanical2electricalDegrees[PITCH],
@@ -205,7 +205,7 @@ void computeMotorCommands(float dt)
 
     if (eepromConfig.yawEnabled == true)
     {
-        if (false)
+        if (eepromConfig.pidController == true)
         {
 			motorCmd[YAW] = updatePID(pointingCmd[YAW] * mechanical2electricalDegrees[YAW],
         	    	                  sensors.evvgcCFAttitude500Hz[YAW] * mechanical2electricalDegrees[YAW],

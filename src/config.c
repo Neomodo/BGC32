@@ -268,6 +268,8 @@ void checkFirstTime(bool eepromReset)
         eepromConfig.pitchReverse = false;
         eepromConfig.yawReverse   = false;
 
+        eepromConfig.pidController = false;
+
         writeEEPROM();
     }
 }

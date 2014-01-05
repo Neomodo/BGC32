@@ -1,3 +1,34 @@
+/*
+
+BGC32 from FocusFlight, a new alternative firmware
+for the EvvGC controller
+
+Original work Copyright (c) 2013 John Ihlein
+                                 Alan K. Adamson
+
+This file is part of BGC32.
+
+Includes code and/or ideas from:
+
+  1)BaseFlight
+  2)EvvGC
+  2)S.O.H. Madgwick
+
+BGC32 is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+BGC32 is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with EvvGC. If not, see <http://www.gnu.org/licenses/>.
+
+*/
+
 ///////////////////////////////////////////////////////////////////////////////
 
 #include "board.h"
@@ -9,7 +40,7 @@
 
 ///////////////////////////////////////
 
-static volatile uint16_t adc1Values[8];
+static volatile uint16_t adc1Values[8] = { 0, 0, 0, 0, 0, 0, 0, 0, };
 
 ///////////////////////////////////////////////////////////////////////////////
 //  ADC Initialization
@@ -64,14 +95,14 @@ void adcInit(void)
 
     ADC_Init(ADC1, &ADC_InitStructure);
 
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_13, 1, ADC_SampleTime_55Cycles5);
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_12, 2, ADC_SampleTime_55Cycles5);
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_13, 3, ADC_SampleTime_55Cycles5);
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_12, 4, ADC_SampleTime_55Cycles5);
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_13, 5, ADC_SampleTime_55Cycles5);
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_12, 6, ADC_SampleTime_55Cycles5);
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_13, 7, ADC_SampleTime_55Cycles5);
-    ADC_RegularChannelConfig(ADC1, ADC_Channel_12, 8, ADC_SampleTime_55Cycles5);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_13, 1, ADC_SampleTime_239Cycles5);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_12, 2, ADC_SampleTime_239Cycles5);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_13, 3, ADC_SampleTime_239Cycles5);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_12, 4, ADC_SampleTime_239Cycles5);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_13, 5, ADC_SampleTime_239Cycles5);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_12, 6, ADC_SampleTime_239Cycles5);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_13, 7, ADC_SampleTime_239Cycles5);
+    ADC_RegularChannelConfig(ADC1, ADC_Channel_12, 8, ADC_SampleTime_239Cycles5);
 
     ADC_DMACmd(ADC1, ENABLE);
 
@@ -92,7 +123,7 @@ void adcInit(void)
 
 float adcAux1Value(void)
 {
-    return (float)(adc1Values[0] + adc1Values[2] + adc1Values[4] + adc1Values[6]) / 4.0f;
+    return (float)(adc1Values[2]); // + adc1Values[2] + adc1Values[4] + adc1Values[6]) / 4.0f;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

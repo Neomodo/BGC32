@@ -263,10 +263,12 @@ void systemInit(void)
 
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB |
                            RCC_APB2Periph_GPIOC | RCC_APB2Periph_AFIO  |
-                           RCC_APB2Periph_TIM1  | RCC_APB2Periph_TIM8, ENABLE);
+                           RCC_APB2Periph_TIM1  | RCC_APB2Periph_TIM8  |
+                           RCC_APB2Periph_ADC1, ENABLE);
 
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3  | RCC_APB1Periph_TIM4  |
-                           RCC_APB1Periph_TIM5  | RCC_APB1Periph_TIM6  | RCC_APB1Periph_I2C2, ENABLE);
+                           RCC_APB1Periph_TIM5  | RCC_APB1Periph_TIM6  |
+                           RCC_APB1Periph_I2C2, ENABLE);
 
     RCC_AHBPeriphClockCmd(RCC_AHBPeriph_DMA1, ENABLE);
 

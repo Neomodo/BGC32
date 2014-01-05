@@ -595,6 +595,23 @@ void cliCom(void)
                 cliQuery = 'x';
                 break;
 
+                ///////////////////////////
+
+            case 'w': // Toggle Vertical Velocity Hold Only
+                if (eepromConfig.pidController)
+                {
+                	eepromConfig.pidController = false;
+                    cliPrintF("\nUsing PDF Controller....\n");
+                }
+                else
+                {
+                	eepromConfig.pidController = true;
+                    cliPrintF("\nUsing PID Controller....\n");
+                }
+
+                cliQuery = 'x';
+                break;
+
                 ///////////////////////////////
 
             case 'x':
@@ -613,7 +630,7 @@ void cliCom(void)
                 ///////////////////////////////
 
             case 'z':
-                cliPrintF("%5.2f, %5.2f\n", adcAux1Value(),
+                cliPrintF("%7.2f, %7.2f\n", adcAux1Value(),
                             		        adcAux2Value());
                 break;
 
@@ -1214,7 +1231,7 @@ void cliCom(void)
                 cliPrintF("'t' Pointing Commands              'T' Set Pitch Filters            TAtt;RateCmd;AttCmd\n");
                 cliPrintF("'u' PID Outputs                    'U' Set Yaw Filters              UAtt;RateCmd;AttCmd\n");
                 cliPrintF("'v' Version                        'V' Reset EEPROM Parameters\n");
-                cliPrintF("'w' Not Used                       'W' Write EEPROM Parameters\n");
+                cliPrintF("'w' Toggle PID/PDF Controller      'W' Write EEPROM Parameters\n");
                 cliPrintF("'x' Terminate CLI Communication    'X' Not Used\n");
                 cliPrintF("\n");
 
@@ -1232,8 +1249,8 @@ void cliCom(void)
                 }
 
                 cliPrintF("\n");
-                cliPrintF("'y' AutoPan Enbale Flags           'Y' Set AutoPan Enable Flags     YR;P;Y\n");
-                cliPrintF("'z' Not Used                       'Z' Toggle CLI Enable/Disable State\n");
+                cliPrintF("'y' AutoPan Enable Flags           'Y' Set AutoPan Enable Flags     YR;P;Y\n");
+                cliPrintF("'z' Raw Aux1/Aux2 ADC Values       'Z' Toggle CLI Enable/Disable State\n");
                 cliPrintF("'+' Increment Test Phase           '?' Command Summary\n");
                 cliPrintF("'-' Decrement Test Phase\n");
                 cliPrintF("\n");
