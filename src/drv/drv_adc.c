@@ -35,8 +35,10 @@ along with EvvGC. If not, see <http://www.gnu.org/licenses/>.
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#define AUX1_PIN GPIO_Pin_13
-#define AUX2_PIN GPIO_Pin_12
+#define AUX1_ADC_PIN  GPIO_Pin_3  // ADC123_IN13
+#define AUX2_ADC_PIN  GPIO_Pin_2  // ADC123_IN12
+
+#define AUX_ADC_PORT  GPIOC
 
 ///////////////////////////////////////
 
@@ -54,11 +56,11 @@ void adcInit(void)
 
     ///////////////////////////////////
 
-    GPIO_InitStructure.GPIO_Pin   = AUX1_PIN | AUX2_PIN;
+    GPIO_InitStructure.GPIO_Pin   = AUX1_ADC_PIN | AUX2_ADC_PIN;
     GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AIN;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
 
-    GPIO_Init(GPIOC, &GPIO_InitStructure);
+    GPIO_Init(AUX_ADC_PORT, &GPIO_InitStructure);
 
     ///////////////////////////////////
 
@@ -123,7 +125,7 @@ void adcInit(void)
 
 float adcAux1Value(void)
 {
-    return (float)(adc1Values[2]); // + adc1Values[2] + adc1Values[4] + adc1Values[6]) / 4.0f;
+    return (float)(adc1Values[0] + adc1Values[2] + adc1Values[4] + adc1Values[6]) / 4.0f;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
