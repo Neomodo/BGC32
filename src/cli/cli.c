@@ -523,15 +523,6 @@ void cliCom(void)
 
                 ///////////////////////////////
 
-            case 'p': // Counters
-                cliPrintF("Counter min %3d, %3d, %3d,  max %4d, %4d, %4d, count %3d, %3d, %3d\n",
-                          minCnt[ROLL], minCnt[PITCH], minCnt[YAW],
-                          maxCnt[ROLL], maxCnt[PITCH], maxCnt[YAW],
-                          irqCnt[ROLL], irqCnt[PITCH], irqCnt[YAW]);
-                break;
-
-                ///////////////////////////////
-
             case 'q': // Filter Time Constants
                 cliPrintF("\n         Accel TC       Rate Cmd TC    Att Cmd TC\n");
 
@@ -597,7 +588,7 @@ void cliCom(void)
 
                 ///////////////////////////
 
-            case 'w': // Toggle Vertical Velocity Hold Only
+            case 'w': // Toggle PID/PDF Controller
                 if (eepromConfig.pidController)
                 {
                 	eepromConfig.pidController = false;
@@ -633,6 +624,8 @@ void cliCom(void)
                 cliPrintF("%7.2f, %7.2f\n", adcAux1Value(),
                             		        adcAux2Value());
                 break;
+
+                ///////////////////////////////
 
                 ///////////////////////////////////////////////////////////////////////
                 ///////////////////////////////////////////////////////////////////////
@@ -1224,7 +1217,7 @@ void cliCom(void)
                 cliPrintF("'m' Test Phase                     'M' Set Test Phase\n");
                 cliPrintF("'n' Test Phase Delta               'N' Set Test Phase Delta\n");
                 cliPrintF("'o' Motor Pole Counts              'O' Set Motor Pole Counts        ORPC;PPC;YPC\n");
-                cliPrintF("'p' Counters                       'P' Sensor CLI\n");
+                cliPrintF("'p' Not Used                       'P' Sensor CLI\n");
                 cliPrintF("'q' Filter Time Constants          'Q' Set Roll Filters             QAtt;RateCmd;AttCmd\n");
                 cliPrintF("'r' Gimbal Axis Rotation Flags     'R' Reset and Enter Bootloader\n");
                 cliPrintF("'s' Raw Receiver Commands          'S' Reset\n");
