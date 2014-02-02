@@ -292,12 +292,12 @@ static void timerPWMadvancedConfig(TIM_TypeDef *tim)
     TIM_TimeBaseInit(tim, &TIM_TimeBaseInitStructure);
 
     //Configuration in PWM mode
-    TIM_OCInitStructure.TIM_OCMode       = TIM_OCMode_PWM1;
+    TIM_OCInitStructure.TIM_OCMode       = TIM_OCMode_PWM2;
     TIM_OCInitStructure.TIM_OutputState  = TIM_OutputState_Enable;
     TIM_OCInitStructure.TIM_OutputNState = TIM_OutputNState_Enable;
     TIM_OCInitStructure.TIM_Pulse        = 0;
-    TIM_OCInitStructure.TIM_OCPolarity   = TIM_OCPolarity_Low;
-    TIM_OCInitStructure.TIM_OCNPolarity  = TIM_OCNPolarity_Low;
+    TIM_OCInitStructure.TIM_OCPolarity   = TIM_OCPolarity_High;
+    TIM_OCInitStructure.TIM_OCNPolarity  = TIM_OCNPolarity_High;
     TIM_OCInitStructure.TIM_OCIdleState  = TIM_OCIdleState_Set;
     TIM_OCInitStructure.TIM_OCNIdleState = TIM_OCIdleState_Reset;
 
@@ -332,7 +332,7 @@ static void timerPWMgeneralConfig(TIM_TypeDef *tim, int polarity)
 
     TIM_TimeBaseInit(tim, &TIM_TimeBaseInitStructure);
 
-    TIM_OCInitStructure.TIM_OCMode      = TIM_OCMode_PWM1;
+    TIM_OCInitStructure.TIM_OCMode      = TIM_OCMode_PWM2;
     TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
     TIM_OCInitStructure.TIM_Pulse       = 0;
     TIM_OCInitStructure.TIM_OCPolarity  = polarity;
@@ -408,12 +408,12 @@ void setYawPWMData(int *target, int *pwm)
 {
     __disable_irq();
 
-    target[0] = pwm[0] - halfDeadTimeDelay;
-    target[1] = pwm[1] - halfDeadTimeDelay;
-    target[2] = pwm[2] - halfDeadTimeDelay;
-    target[3] = pwm[0] + halfDeadTimeDelay;
-    target[4] = pwm[1] + halfDeadTimeDelay;
-    target[5] = pwm[2] + halfDeadTimeDelay;
+    target[0] = pwm[0] + halfDeadTimeDelay;
+    target[1] = pwm[1] + halfDeadTimeDelay;
+    target[2] = pwm[2] + halfDeadTimeDelay;
+    target[3] = pwm[0] - halfDeadTimeDelay;
+    target[4] = pwm[1] - halfDeadTimeDelay;
+    target[5] = pwm[2] - halfDeadTimeDelay;
 
     __enable_irq();
 }
@@ -563,8 +563,8 @@ void pwmMotorDriverInit(void)
     GPIO_InitStructure.GPIO_Pin   = YAW_AN_PIN | YAW_BN_PIN | YAW_CN_PIN;
     GPIO_Init(GPIOB, &GPIO_InitStructure);
 
-    timerPWMgeneralConfig(TIM5, TIM_OCPolarity_Low);
-    timerPWMgeneralConfig(TIM4, TIM_OCPolarity_High);
+    timerPWMgeneralConfig(TIM5, TIM_OCPolarity_High);
+    timerPWMgeneralConfig(TIM4, TIM_OCPolarity_Low);
 
     TIM5->CNT = 0;
     TIM4->CNT = 0;
