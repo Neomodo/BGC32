@@ -126,15 +126,15 @@ static uint8_t pwmMotorDriverInitDone = false;
 
 ///////////////////////////////////////
 
-int deadTimeRegister  =  82;  // TIM_ClockDivision = TIM_CKD_DIV2, Tdts = 1 / (36 MHz)
-                              // Tdtg = Tdts = 27.78 nSec
-                              // deadtime = 82 * Tdtg = 2.278 uSec
+int deadTimeRegister  = 144;  //   82;  // TIM_ClockDivision = TIM_CKD_DIV2, Tdts = 1 / (36 MHz)
+                                        // Tdtg = Tdts = 27.78 nSec
+                                        // deadtime = 82 * Tdtg = 2.278 uSec
 
-int deadTimeDelay     =  82;  // 36 MHz ticks for center aligned PWM mode
-                              // deadtime = 82 / 36E6 = 2.278 uSec
+int deadTimeDelay     = 160;  //   82;  // 36 MHz ticks for center aligned PWM mode
+                                        // deadtime = 82 / 36E6 = 2.278 uSec
 
-int halfDeadTimeDelay =  41;  // 36 MHz ticks for center aligned PWM mode
-                              // halfDeadtime = 41 / 36E6 =  1.139 uSec
+int halfDeadTimeDelay =  80;  //   41;  // 36 MHz ticks for center aligned PWM mode
+                                        // halfDeadtime = 41 / 36E6 =  1.139 uSec
 
 ///////////////////////////////////////
 
